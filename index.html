@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#11111d">
+<title>Videoclip IA</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#11111d;color:white;font-family:Arial,sans-serif}
+header{text-align:center;padding:25px 10px}
+.logo{font-size:42px}
+h1{color:#b99aff;margin:10px 0}
+p{color:#c7c5d3;line-height:1.5}
+.card{background:#202033;border:1px solid #393650;border-radius:18px;padding:20px;margin:15px 0}
+button{background:linear-gradient(90deg,#8055e9,#ba69e8);color:white;border:0;border-radius:12px;padding:15px;width:100%;font-size:16px;font-weight:bold;margin-top:12px}
+input,select,textarea{width:100%;padding:13px;margin:8px 0;background:#151522;color:white;border:1px solid #51486b;border-radius:9px}
+label{display:block;margin:13px 0;color:#eee}
+h2{color:#c7a8ff}
+small{color:#aaa}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">🎬</div>
+<h1>VIDEOCLIP IA</h1>
+<p>Convertí tu música en una historia visual.</p>
+</header>
+
+<main>
+<section id="inicio" class="card">
+<h2>Bienvenido</h2>
+<p>Creá tu propio videoclip a partir de una canción y tus imágenes de referencia.</p>
+<button onclick="mostrar('proyecto')">CREAR MI VIDEOCLIP</button>
+</section>
+
+<section id="proyecto" class="card hidden">
+<h2>1. Tu proyecto</h2>
+<label>Nombre del videoclip</label>
+<input id="nombre" placeholder="Mi primer videoclip">
+<label>Seleccioná tu canción MP3</label>
+<input id="audio" type="file" accept="audio/*">
+<label>Agregá tus fotos de referencia</label>
+<input id="fotos" type="file" accept="image/*" multiple>
+<label>Contanos qué historia querés contar</label>
+<textarea id="idea" rows="3" placeholder="Describí tu idea..."></textarea>
+<button onclick="mostrar('estilo')">CONTINUAR</button>
+</section>
+
+<section id="estilo" class="card hidden">
+<h2>2. Elegí tu estilo visual</h2>
+<label><input type="radio" name="estilo" value="Cinematográfico realista" checked> 🎥 Película realista</label>
+<label><input type="radio" name="estilo" value="Anime"> 🌸 Anime</label>
+<label><input type="radio" name="estilo" value="Fantasía"> ✨ Fantasía y efectos</label>
+<label>Tipo de historia</label>
+<select id="historia">
+<option>Historia cinematográfica</option>
+<option>Historia romántica</option>
+<option>Acción y aventura</option>
+<option>Fantasía y misterio</option>
+<option>Imágenes sincronizadas con la música</option>
+</select>
+<label>¿Cómo querés que termine?</label>
+<select id="final">
+<option>Final emocionante</option>
+<option>Final feliz</option>
+<option>Final dramático</option>
+<option>Final sorpresa</option>
+</select>
+<label>Resolución deseada</label>
+<select id="calidad">
+<option>360p</option>
+<option>720p</option>
+<option>1080p</option>
+</select>
+<button onclick="mostrarResumen()">VER MI PROYECTO</button>
+</section>
+
+<section id="resumen" class="card hidden">
+<h2>3. Revisá tu proyecto</h2>
+<div id="datos"></div>
+<p>Esta es una primera versión de la aplicación. Todavía no genera el videoclip: estamos construyendo su interfaz y sus funciones iniciales.</p>
+<button onclick="confirmar()">CONFIRMAR PROYECTO</button>
+<button onclick="mostrar('estilo')">VOLVER A EDITAR</button>
+</section>
+</main>
+
+<script>
+function mostrar(id){
+document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+window.scrollTo(0,0);
+}
+function mostrarResumen(){
+let estilo=document.querySelector('input[name="estilo"]:checked').value;
+document.getElementById('datos').innerHTML=
+'<p><b>Nombre:</b> '+escapar(document.getElementById('nombre').value)+'</p>'+
+'<p><b>Estilo:</b> '+estilo+'</p>'+
+'<p><b>Historia:</b> '+document.getElementById('historia').value+'</p>'+
+'<p><b>Final:</b> '+document.getElementById('final').value+'</p>'+
+'<p><b>Resolución:</b> '+document.getElementById('calidad').value+'</p>';
+mostrar('resumen');
+}
+function escapar(t){
+return t.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function confirmar(){
+alert('¡Proyecto confirmado! Esta versión todavía no genera videos. Seguiremos desarrollando las funciones de Videoclip IA.');
+}
+</script>
+</body>
+</html>
