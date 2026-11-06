@@ -5,279 +5,250 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#11111d">
 <title>Videoclip IA</title>
-
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 20px;
-  background: #11111d;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-
-header {
-  text-align: center;
-  padding: 25px 10px;
-}
-
-.logo {
-  font-size: 42px;
-}
-
-h1 {
-  color: #b99aff;
-  margin: 10px 0;
-}
-
-p {
-  color: #c7c5d3;
-  line-height: 1.5;
-}
-
-.card {
-  background: #202033;
-  border: 1px solid #393650;
-  border-radius: 18px;
-  padding: 20px;
-  margin: 15px 0;
-}
-
-button {
-  background: linear-gradient(90deg, #8055e9, #ba69e8);
-  color: white;
-  border: 0;
-  border-radius: 12px;
-  padding: 15px;
-  width: 100%;
-  font-size: 16px;
-  font-weight: bold;
-  margin-top: 12px;
-}
-
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 13px;
-  margin: 8px 0;
-  background: #151522;
-  color: white;
-  border: 1px solid #51486b;
-  border-radius: 9px;
-}
-
-label {
-  display: block;
-  margin: 13px 0;
-  color: #eee;
-}
-
-h2 {
-  color: #c7a8ff;
-}
-
-small {
-  color: #aaa;
-}
-
-.hidden {
-  display: none;
-}
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#11111d;color:white;font-family:Arial,sans-serif}
+header{text-align:center;padding:25px 10px}
+.logo{font-size:42px}
+h1{color:#b99aff;margin:10px 0}
+p{color:#c7c5d3;line-height:1.5}
+.card{background:#202033;border:1px solid #393650;border-radius:18px;padding:20px;margin:15px 0}
+button{background:linear-gradient(90deg,#8055e9,#ba69e8);color:white;border:0;border-radius:12px;padding:15px;width:100%;font-size:16px;font-weight:bold;margin-top:12px}
+input,select,textarea{width:100%;padding:13px;margin:8px 0;background:#151522;color:white;border:1px solid #51486b;border-radius:9px}
+label{display:block;margin:13px 0;color:#eee}
+h2{color:#c7a8ff}
+small{color:#aaa}
+.hidden{display:none}
+.audio-panel{background:#151522;border:1px solid #51486b;border-radius:12px;padding:14px;margin:10px 0 16px}
+.audio-status{margin:8px 0;color:#c7c5d3;font-size:14px}
+.audio-error{margin:8px 0;color:#ff9b9b;font-size:14px}
+.audio-progress{width:100%;margin:8px 0;accent-color:#b99aff}
+.audio-times{display:flex;justify-content:space-between;color:#aaa;font-size:13px}
+.audio-buttons{display:flex;gap:8px}
+.audio-buttons button{margin-top:8px;padding:11px 8px;font-size:14px}
 </style>
 </head>
-
 <body>
 
 <header>
-  <div class="logo">🎬</div>
-  <h1>VIDEOCLIP IA</h1>
-  <p>Convertí tu música en una historia visual.</p>
+<div class="logo">🎬</div>
+<h1>VIDEOCLIP IA</h1>
+<p>Convertí tu música en una historia visual.</p>
 </header>
 
 <main>
+<section id="inicio" class="card">
+<h2>Bienvenido</h2>
+<p>Creá tu propio videoclip a partir de una canción y tus imágenes de referencia.</p>
+<button onclick="mostrar('proyecto')">CREAR MI VIDEOCLIP</button>
+</section>
 
-  <section id="inicio" class="card">
-    <h2>Bienvenido</h2>
-    <p>
-      Creá tu propio videoclip a partir de una canción
-      y tus imágenes de referencia.
-    </p>
+<section id="proyecto" class="card hidden">
+<h2>1. Tu proyecto</h2>
+<label>Nombre del videoclip</label>
+<input id="nombre" placeholder="Mi primer videoclip">
+<label>Seleccioná tu canción MP3</label>
+<input id="audio" type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/mp4,audio/webm">
+<div class="audio-panel" aria-live="polite">
+<audio id="reproductorAudio" preload="metadata"></audio>
+<div id="audioEstado" class="audio-status">Todavía no seleccionaste una canción.</div>
+<div id="audioError" class="audio-error" role="alert"></div>
+<button type="button" id="botonReproducir" onclick="alternarReproduccion()" disabled>REPRODUCIR</button>
+<div class="audio-buttons">
+<button type="button" onclick="saltarAudio(-10)" disabled>−10 s</button>
+<button type="button" onclick="saltarAudio(10)" disabled>+10 s</button>
+</div>
+<input id="barraAudio" class="audio-progress" type="range" min="0" max="0" value="0" step="0.1" aria-label="Progreso de la canción" disabled>
+<div class="audio-times"><span id="tiempoActual">00:00</span><span id="duracionAudio">00:00</span></div>
+</div>
+<label>Agregá tus fotos de referencia</label>
+<input id="fotos" type="file" accept="image/*" multiple>
+<label>Contanos qué historia querés contar</label>
+<textarea id="idea" rows="3" placeholder="Describí tu idea..."></textarea>
+<button onclick="mostrar('estilo')">CONTINUAR</button>
+</section>
 
-    <button onclick="mostrar('proyecto')">
-      CREAR MI VIDEOCLIP
-    </button>
-  </section>
+<section id="estilo" class="card hidden">
+<h2>2. Elegí tu estilo visual</h2>
+<label><input type="radio" name="estilo" value="Cinematográfico realista" checked> 🎥 Película realista</label>
+<label><input type="radio" name="estilo" value="Anime"> 🌸 Anime</label>
+<label><input type="radio" name="estilo" value="Fantasía"> ✨ Fantasía y efectos</label>
+<label>Tipo de historia</label>
+<select id="historia">
+<option>Historia cinematográfica</option>
+<option>Historia romántica</option>
+<option>Acción y aventura</option>
+<option>Fantasía y misterio</option>
+<option>Imágenes sincronizadas con la música</option>
+</select>
+<label>¿Cómo querés que termine?</label>
+<select id="final">
+<option>Final emocionante</option>
+<option>Final feliz</option>
+<option>Final dramático</option>
+<option>Final sorpresa</option>
+</select>
+<label>Resolución deseada</label>
+<select id="calidad">
+<option>360p</option>
+<option>720p</option>
+<option>1080p</option>
+</select>
+<button onclick="mostrarResumen()">VER MI PROYECTO</button>
+</section>
 
-  <section id="proyecto" class="card hidden">
-    <h2>1. Tu proyecto</h2>
-
-    <label>Nombre del videoclip</label>
-    <input id="nombre" placeholder="Mi primer videoclip">
-
-    <label>Seleccioná tu canción MP3</label>
-    <input id="audio" type="file" accept="audio/*">
-
-    <label>Agregá tus fotos de referencia</label>
-    <input id="fotos" type="file" accept="image/*" multiple>
-
-    <label>Contanos qué historia querés contar</label>
-    <textarea
-      id="idea"
-      rows="3"
-      placeholder="Describí tu idea..."
-    ></textarea>
-
-    <button onclick="mostrar('estilo')">
-      CONTINUAR
-    </button>
-  </section>
-
-  <section id="estilo" class="card hidden">
-    <h2>2. Elegí tu estilo visual</h2>
-
-    <label>
-      <input
-        type="radio"
-        name="estilo"
-        value="Cinematográfico realista"
-        checked
-      >
-      🎥 Película realista
-    </label>
-
-    <label>
-      <input
-        type="radio"
-        name="estilo"
-        value="Anime"
-      >
-      🌸 Anime
-    </label>
-
-    <label>
-      <input
-        type="radio"
-        name="estilo"
-        value="Fantasía"
-      >
-      ✨ Fantasía y efectos
-    </label>
-
-    <label>Tipo de historia</label>
-    <select id="historia">
-      <option>Historia cinematográfica</option>
-      <option>Historia romántica</option>
-      <option>Acción y aventura</option>
-      <option>Fantasía y misterio</option>
-      <option>Imágenes sincronizadas con la música</option>
-    </select>
-
-    <label>¿Cómo querés que termine?</label>
-    <select id="final">
-      <option>Final emocionante</option>
-      <option>Final feliz</option>
-      <option>Final dramático</option>
-      <option>Final sorpresa</option>
-    </select>
-
-    <label>Resolución deseada</label>
-    <select id="calidad">
-      <option>360p</option>
-      <option>720p</option>
-      <option>1080p</option>
-    </select>
-
-    <button onclick="mostrarResumen()">
-      VER MI PROYECTO
-    </button>
-  </section>
-
-  <section id="resumen" class="card hidden">
-    <h2>3. Revisá tu proyecto</h2>
-
-    <div id="datos"></div>
-
-    <p>
-      Esta es una primera versión de la aplicación.
-      Todavía no genera el videoclip: estamos construyendo
-      su interfaz y sus funciones iniciales.
-    </p>
-
-    <button onclick="confirmar()">
-      CONFIRMAR PROYECTO
-    </button>
-
-    <button onclick="mostrar('estilo')">
-      VOLVER A EDITAR
-    </button>
-  </section>
-
+<section id="resumen" class="card hidden">
+<h2>3. Revisá tu proyecto</h2>
+<div id="datos"></div>
+<p>Esta es una primera versión de la aplicación. Todavía no genera el videoclip: estamos construyendo su interfaz y sus funciones iniciales.</p>
+<button onclick="confirmar()">CONFIRMAR PROYECTO</button>
+<button onclick="mostrar('estilo')">VOLVER A EDITAR</button>
+</section>
 </main>
 
 <script>
-function mostrar(id) {
-  document
-    .querySelectorAll("main section")
-    .forEach(function(seccion) {
-      seccion.classList.add("hidden");
-    });
+let urlAudioActual = null;
 
-  document.getElementById(id).classList.remove("hidden");
-  window.scrollTo(0, 0);
+function mostrar(id){
+document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+window.scrollTo(0,0);
 }
 
-function mostrarResumen() {
-  let estilo = document.querySelector(
-    'input[name="estilo"]:checked'
-  ).value;
-
-  document.getElementById("datos").innerHTML =
-    "<p><b>Nombre:</b> " +
-    escapar(document.getElementById("nombre").value) +
-    "</p>" +
-
-    "<p><b>Estilo:</b> " +
-    escapar(estilo) +
-    "</p>" +
-
-    "<p><b>Historia:</b> " +
-    escapar(document.getElementById("historia").value) +
-    "</p>" +
-
-    "<p><b>Final:</b> " +
-    escapar(document.getElementById("final").value) +
-    "</p>" +
-
-    "<p><b>Resolución:</b> " +
-    escapar(document.getElementById("calidad").value) +
-    "</p>";
-
-  mostrar("resumen");
+function formatearTiempo(segundos){
+if(!Number.isFinite(segundos) || segundos < 0){return '00:00';}
+let minutos=Math.floor(segundos/60);
+let segundosRestantes=Math.floor(segundos%60);
+return String(minutos).padStart(2,'0')+':'+String(segundosRestantes).padStart(2,'0');
 }
 
-function escapar(texto) {
-  return texto.replace(/[&<>"']/g, function(caracter) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[caracter];
-  });
+function actualizarEstadoAudio(mensaje){
+document.getElementById('audioEstado').textContent=mensaje;
 }
 
-function confirmar() {
-  alert(
-    "¡Proyecto confirmado! Esta versión todavía no genera videos. " +
-    "Seguiremos desarrollando las funciones de Videoclip IA."
-  );
+function mostrarErrorAudio(mensaje){
+document.getElementById('audioError').textContent=mensaje;
+}
+
+function activarControlesAudio(activar){
+document.getElementById('botonReproducir').disabled=!activar;
+document.querySelectorAll('.audio-buttons button').forEach(boton=>boton.disabled=!activar);
+document.getElementById('barraAudio').disabled=!activar;
+}
+
+function reiniciarDatosAudio(){
+let reproductor=document.getElementById('reproductorAudio');
+reproductor.pause();
+reproductor.removeAttribute('src');
+reproductor.load();
+document.getElementById('botonReproducir').textContent='REPRODUCIR';
+document.getElementById('barraAudio').value=0;
+document.getElementById('barraAudio').max=0;
+document.getElementById('tiempoActual').textContent='00:00';
+document.getElementById('duracionAudio').textContent='00:00';
+activarControlesAudio(false);
+}
+
+function cargarAudio(evento){
+let archivo=evento.target.files[0];
+let reproductor=document.getElementById('reproductorAudio');
+mostrarErrorAudio('');
+reiniciarDatosAudio();
+
+if(urlAudioActual){
+URL.revokeObjectURL(urlAudioActual);
+urlAudioActual=null;
+}
+
+if(!archivo){
+actualizarEstadoAudio('Todavía no seleccionaste una canción.');
+return;
+}
+
+let extensionValida=/\.(mp3|wav|ogg|oga|m4a|mp4|webm)$/i.test(archivo.name);
+if(!archivo.type.startsWith('audio/') && !extensionValida){
+evento.target.value='';
+actualizarEstadoAudio('Todavía no seleccionaste una canción.');
+mostrarErrorAudio('El archivo seleccionado no es un audio compatible. Elegí un MP3 u otro formato de audio.');
+return;
+}
+
+urlAudioActual=URL.createObjectURL(archivo);
+reproductor.src=urlAudioActual;
+reproductor.load();
+actualizarEstadoAudio('Cargando: '+archivo.name);
+}
+
+function alternarReproduccion(){
+let reproductor=document.getElementById('reproductorAudio');
+if(!reproductor.src){return;}
+if(reproductor.paused){
+reproductor.play().catch(()=>mostrarErrorAudio('No se pudo reproducir el audio. Tocá nuevamente el botón para intentar.'));
+}else{
+reproductor.pause();
+}
+}
+
+function saltarAudio(segundos){
+let reproductor=document.getElementById('reproductorAudio');
+if(!Number.isFinite(reproductor.duration)){return;}
+reproductor.currentTime=Math.min(Math.max(reproductor.currentTime+segundos,0),reproductor.duration);
+}
+
+function configurarAudio(){
+let selector=document.getElementById('audio');
+let reproductor=document.getElementById('reproductorAudio');
+let barra=document.getElementById('barraAudio');
+selector.addEventListener('change',cargarAudio);
+reproductor.addEventListener('loadedmetadata',function(){
+barra.max=reproductor.duration;
+barra.value=0;
+document.getElementById('duracionAudio').textContent=formatearTiempo(reproductor.duration);
+actualizarEstadoAudio('Canción lista: '+selector.files[0].name);
+activarControlesAudio(true);
+});
+reproductor.addEventListener('timeupdate',function(){
+barra.value=reproductor.currentTime;
+document.getElementById('tiempoActual').textContent=formatearTiempo(reproductor.currentTime);
+});
+reproductor.addEventListener('play',function(){
+document.getElementById('botonReproducir').textContent='PAUSAR';
+});
+reproductor.addEventListener('pause',function(){
+document.getElementById('botonReproducir').textContent='REPRODUCIR';
+});
+reproductor.addEventListener('ended',function(){
+document.getElementById('botonReproducir').textContent='REPRODUCIR';
+barra.value=0;
+});
+reproductor.addEventListener('error',function(){
+reiniciarDatosAudio();
+mostrarErrorAudio('No se pudo cargar este archivo. Probá con un MP3, WAV, OGG, M4A o WEBM válido.');
+actualizarEstadoAudio('No se pudo cargar la canción.');
+});
+barra.addEventListener('input',function(){
+if(Number.isFinite(reproductor.duration)){reproductor.currentTime=Number(barra.value);}
+});
+}
+
+configurarAudio();
+
+function mostrarResumen(){
+let estilo=document.querySelector('input[name="estilo"]:checked').value;
+document.getElementById('datos').innerHTML=
+'<p><b>Nombre:</b> '+escapar(document.getElementById('nombre').value)+'</p>'+
+'<p><b>Estilo:</b> '+estilo+'</p>'+
+'<p><b>Historia:</b> '+document.getElementById('historia').value+'</p>'+
+'<p><b>Final:</b> '+document.getElementById('final').value+'</p>'+
+'<p><b>Resolución:</b> '+document.getElementById('calidad').value+'</p>';
+mostrar('resumen');
+}
+function escapar(t){
+return t.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function confirmar(){
+alert('¡Proyecto confirmado! Esta versión todavía no genera videos. Seguiremos desarrollando las funciones de Videoclip IA.');
 }
 </script>
-
 </body>
 </html>
