@@ -26,6 +26,12 @@ small{color:#aaa}
 .audio-times{display:flex;justify-content:space-between;color:#aaa;font-size:13px}
 .audio-buttons{display:flex;gap:8px}
 .audio-buttons button{margin-top:8px;padding:11px 8px;font-size:14px}
+.secondary{background:#393650}
+.success{background:#173b2a;border:1px solid #4fbe7d;border-radius:12px;padding:14px;margin:12px 0;color:#d9ffe9}
+.scene-list{display:grid;gap:10px;margin:14px 0}
+.scene{background:#151522;border:1px solid #51486b;border-radius:12px;padding:14px}
+.scene strong{display:block;color:#d4bcff;margin-bottom:6px}
+.scene small{display:block;color:#aaa;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -100,9 +106,24 @@ small{color:#aaa}
 <section id="resumen" class="card hidden">
 <h2>3. Revisá tu proyecto</h2>
 <div id="datos"></div>
-<p>Esta es una primera versión de la aplicación. Todavía no genera el videoclip: estamos construyendo su interfaz y sus funciones iniciales.</p>
+<p>Revisá los datos antes de confirmar. La propuesta de escenas se prepara en el paso siguiente; todavía no se exporta un MP4.</p>
 <button onclick="confirmar()">CONFIRMAR PROYECTO</button>
-<button onclick="mostrar('estilo')">VOLVER A EDITAR</button>
+<button class="secondary" onclick="mostrar('estilo')">VOLVER A EDITAR</button>
+</section>
+
+<section id="confirmado" class="card hidden">
+<h2>4. Proyecto confirmado</h2>
+<div class="success"><strong>El proyecto quedó guardado en esta sesión.</strong><br>Ahora podés preparar una primera propuesta de escenas antes de generar el videoclip.</div>
+<div id="confirmacionDatos"></div>
+<button onclick="generarEscenas()">PREPARAR PROPUESTA DE ESCENAS</button>
+<button class="secondary" onclick="mostrar('resumen')">VOLVER AL RESUMEN</button>
+</section>
+
+<section id="escenas" class="card hidden">
+<h2>5. Propuesta de escenas</h2>
+<p>Esta es una primera propuesta basada en los datos del proyecto. Todavía no genera video: el próximo paso será conectar esta etapa con inteligencia artificial.</p>
+<div id="escenasLista" class="scene-list"></div>
+<button onclick="mostrar('confirmado')">VOLVER AL PROYECTO</button>
 </section>
 </main>
 
@@ -235,19 +256,52 @@ configurarAudio();
 
 function mostrarResumen(){
 let estilo=document.querySelector('input[name="estilo"]:checked').value;
+let audio=document.getElementById('audio').files[0];
+window.proyectoActual={
+nombre:document.getElementById('nombre').value.trim() || 'Mi primer videoclip',
+audio:audio ? audio.name : 'Sin canción seleccionada',
+duracion:document.getElementById('duracionAudio').textContent,
+fotos:document.getElementById('fotos').files.length,
+idea:document.getElementById('idea').value.trim() || 'Sin descripción todavía',
+estilo:estilo,
+historia:document.getElementById('historia').value,
+final:document.getElementById('final').value,
+calidad:document.getElementById('calidad').value
+};
 document.getElementById('datos').innerHTML=
-'<p><b>Nombre:</b> '+escapar(document.getElementById('nombre').value)+'</p>'+
-'<p><b>Estilo:</b> '+estilo+'</p>'+
-'<p><b>Historia:</b> '+document.getElementById('historia').value+'</p>'+
-'<p><b>Final:</b> '+document.getElementById('final').value+'</p>'+
-'<p><b>Resolución:</b> '+document.getElementById('calidad').value+'</p>';
+'<p><b>Nombre:</b> '+escapar(window.proyectoActual.nombre)+'</p>'+
+'<p><b>Canción:</b> '+escapar(window.proyectoActual.audio)+' ('+escapar(window.proyectoActual.duracion)+')</p>'+
+'<p><b>Fotos de referencia:</b> '+window.proyectoActual.fotos+'</p>'+
+'<p><b>Idea:</b> '+escapar(window.proyectoActual.idea)+'</p>'+
+'<p><b>Estilo:</b> '+escapar(window.proyectoActual.estilo)+'</p>'+
+'<p><b>Historia:</b> '+escapar(window.proyectoActual.historia)+'</p>'+
+'<p><b>Final:</b> '+escapar(window.proyectoActual.final)+'</p>'+
+'<p><b>Resolución:</b> '+escapar(window.proyectoActual.calidad)+'</p>';
 mostrar('resumen');
 }
 function escapar(t){
 return t.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function confirmar(){
-alert('¡Proyecto confirmado! Esta versión todavía no genera videos. Seguiremos desarrollando las funciones de Videoclip IA.');
+if(!window.proyectoActual){mostrarResumen();}
+document.getElementById('confirmacionDatos').innerHTML=
+'<p><b>'+escapar(window.proyectoActual.nombre)+'</b> · '+escapar(window.proyectoActual.audio)+' · '+escapar(window.proyectoActual.calidad)+'</p>';
+mostrar('confirmado');
+}
+function generarEscenas(){
+let proyecto=window.proyectoActual || {};
+let idea=proyecto.idea || 'una historia visual';
+let escenas=[
+['01 · La esencia aparece','00:00 — 00:30','Detalles de la textura, la prenda y el ambiente. La identidad empieza a verse en cada elemento.'],
+['02 · El cuerpo le da vida','00:30 — 01:10','Movimiento, postura y primeros planos que muestran cómo la forma cobra vida cuando el cuerpo la lleva.'],
+['03 · Presencia y actitud','01:10 — 01:55','Planos más amplios y ritmo visual para acompañar el estribillo, con una presencia segura y elegante.'],
+['04 · Lo que queda en la mirada','01:55 — 03:08','Una parte más sensorial y pausada: recuerdos, luces y gestos que permanecen después del movimiento.'],
+['05 · El final','03:08 — '+(proyecto.duracion || '03:56'),'La figura se aleja y la imagen queda suspendida. El cierre refleja: '+proyecto.final+'.']
+];
+document.getElementById('escenasLista').innerHTML=escenas.map(escena=>
+'<article class="scene"><strong>'+escapar(escena[0])+'</strong><small>'+escapar(escena[1])+'</small><div>'+escapar(escena[2])+'</div><small>Idea del proyecto: '+escapar(idea)+'</small></article>'
+).join('');
+mostrar('escenas');
 }
 </script>
 </body>
