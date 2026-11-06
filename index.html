@@ -71,6 +71,8 @@ small{color:#aaa}
 <input id="fotos" type="file" accept="image/*" multiple>
 <label>Contanos qué historia querés contar</label>
 <textarea id="idea" rows="3" placeholder="Describí tu idea..."></textarea>
+<label>Letra o transcripción de la canción (opcional)</label>
+<textarea id="letra" rows="5" placeholder="Pegá la letra o una transcripción para que la IA pueda sincronizar mejor las escenas..."></textarea>
 <button onclick="mostrar('estilo')">CONTINUAR</button>
 </section>
 
@@ -121,7 +123,7 @@ small{color:#aaa}
 
 <section id="escenas" class="card hidden">
 <h2>5. Propuesta de escenas</h2>
-<p>Esta es una primera propuesta basada en los datos del proyecto. Todavía no genera video: el próximo paso será conectar esta etapa con inteligencia artificial.</p>
+<p>La propuesta se genera con inteligencia artificial a partir de los datos del proyecto. Todavía no genera video: primero podés revisar el guion visual.</p>
 <div id="escenasLista" class="scene-list"></div>
 <button onclick="mostrar('confirmado')">VOLVER AL PROYECTO</button>
 </section>
@@ -129,6 +131,7 @@ small{color:#aaa}
 
 <script>
 let urlAudioActual = null;
+const escenasApi = 'https://3000-iaydjpvxfcrpl3imybhee-d42ed79e.us5.manus.computer/api/scenes/generate';
 
 function mostrar(id){
 document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
@@ -263,6 +266,7 @@ audio:audio ? audio.name : 'Sin canción seleccionada',
 duracion:document.getElementById('duracionAudio').textContent,
 fotos:document.getElementById('fotos').files.length,
 idea:document.getElementById('idea').value.trim() || 'Sin descripción todavía',
+letra:document.getElementById('letra').value.trim(),
 estilo:estilo,
 historia:document.getElementById('historia').value,
 final:document.getElementById('final').value,
@@ -273,6 +277,7 @@ document.getElementById('datos').innerHTML=
 '<p><b>Canción:</b> '+escapar(window.proyectoActual.audio)+' ('+escapar(window.proyectoActual.duracion)+')</p>'+
 '<p><b>Fotos de referencia:</b> '+window.proyectoActual.fotos+'</p>'+
 '<p><b>Idea:</b> '+escapar(window.proyectoActual.idea)+'</p>'+
+'<p><b>Letra/transcripción:</b> '+(window.proyectoActual.letra ? 'Cargada' : 'No cargada')+'</p>'+
 '<p><b>Estilo:</b> '+escapar(window.proyectoActual.estilo)+'</p>'+
 '<p><b>Historia:</b> '+escapar(window.proyectoActual.historia)+'</p>'+
 '<p><b>Final:</b> '+escapar(window.proyectoActual.final)+'</p>'+
@@ -288,20 +293,34 @@ document.getElementById('confirmacionDatos').innerHTML=
 '<p><b>'+escapar(window.proyectoActual.nombre)+'</b> · '+escapar(window.proyectoActual.audio)+' · '+escapar(window.proyectoActual.calidad)+'</p>';
 mostrar('confirmado');
 }
-function generarEscenas(){
+async function generarEscenas(){
 let proyecto=window.proyectoActual || {};
-let idea=proyecto.idea || 'una historia visual';
-let escenas=[
-['01 · La esencia aparece','00:00 — 00:30','Detalles de la textura, la prenda y el ambiente. La identidad empieza a verse en cada elemento.'],
-['02 · El cuerpo le da vida','00:30 — 01:10','Movimiento, postura y primeros planos que muestran cómo la forma cobra vida cuando el cuerpo la lleva.'],
-['03 · Presencia y actitud','01:10 — 01:55','Planos más amplios y ritmo visual para acompañar el estribillo, con una presencia segura y elegante.'],
-['04 · Lo que queda en la mirada','01:55 — 03:08','Una parte más sensorial y pausada: recuerdos, luces y gestos que permanecen después del movimiento.'],
-['05 · El final','03:08 — '+(proyecto.duracion || '03:56'),'La figura se aleja y la imagen queda suspendida. El cierre refleja: '+proyecto.final+'.']
-];
-document.getElementById('escenasLista').innerHTML=escenas.map(escena=>
-'<article class="scene"><strong>'+escapar(escena[0])+'</strong><small>'+escapar(escena[1])+'</small><div>'+escapar(escena[2])+'</div><small>Idea del proyecto: '+escapar(idea)+'</small></article>'
-).join('');
+let boton=document.querySelector('#confirmado button:not(.secondary)');
+if(boton){boton.disabled=true;boton.textContent='GENERANDO ESCENAS...';}
+document.getElementById('escenasLista').innerHTML='<div class="scene"><strong>La IA está preparando el guion visual...</strong><div>Puede tardar unos segundos.</div></div>';
 mostrar('escenas');
+try{
+let respuesta=await fetch(escenasApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+nombre:proyecto.nombre || 'Mi primer videoclip',
+idea:proyecto.idea || '',
+letra:proyecto.letra || '',
+estilo:proyecto.estilo || 'Cinematográfico realista',
+historia:proyecto.historia || 'Historia cinematográfica',
+final:proyecto.final || 'Final emocionante',
+calidad:proyecto.calidad || '720p',
+duracion:proyecto.duracion || ''
+})});
+let resultado=await respuesta.json();
+if(!respuesta.ok || !resultado.ok){throw new Error('No se pudo generar la propuesta.');}
+document.getElementById('escenasLista').innerHTML=
+'<div class="success"><strong>'+escapar(resultado.titulo)+'</strong><br>'+escapar(resultado.concepto)+'</div>'+resultado.escenas.map(escena=>
+'<article class="scene"><strong>'+String(escena.numero).padStart(2,'0')+' · '+escapar(escena.titulo)+'</strong><small>'+escapar(escena.tiempo)+'</small><div><b>Qué sucede:</b> '+escapar(escena.descripcion)+'</div><div><b>Propuesta visual:</b> '+escapar(escena.visual)+'</div><small><b>Transición:</b> '+escapar(escena.transicion)+'</small></article>'
+).join('');
+}catch(error){
+document.getElementById('escenasLista').innerHTML='<div class="audio-error">No se pudo conectar con el servidor seguro de IA. Revisá la conexión e intentá nuevamente.</div><button onclick="generarEscenas()">REINTENTAR</button>';
+}finally{
+if(boton){boton.disabled=false;boton.textContent='PREPARAR PROPUESTA DE ESCENAS';}
+}
 }
 </script>
 </body>
