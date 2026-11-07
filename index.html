@@ -71,6 +71,8 @@ small{color:#aaa}
 .file-summary{font-size:13px;color:#bff5d2;margin:7px 0}
 .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.style-grid label{margin:0}.style-grid input,.ending-grid input{display:none}.style-card{height:132px;display:flex;flex-direction:column;justify-content:flex-end;padding:13px;border:1px solid #51486b;border-radius:16px;overflow:hidden;position:relative;background:#211b38;cursor:pointer}.style-card:before{content:"";position:absolute;inset:0;background:var(--visual);opacity:.75;transition:transform .3s,opacity .3s}.style-card>*{position:relative;z-index:1}.style-card strong{font-size:14px;text-shadow:0 2px 8px #000}.style-card small{font-size:11px;color:#eee;margin-top:3px;text-shadow:0 2px 8px #000}.style-grid input:checked+.style-card{border-color:var(--cyan);box-shadow:0 0 24px rgba(110,231,255,.2)}.style-grid input:checked+.style-card:before{transform:scale(1.14);opacity:1}.style-cinema{--visual:radial-gradient(circle at 70% 20%,#f2c37d,#a55f88 25%,#171329 70%)}.style-neon{--visual:linear-gradient(135deg,#051f57,#13d1d1 48%,#d948ef)}.style-dream{--visual:radial-gradient(circle at 30% 15%,#ffd7ec,#9a7ff5 40%,#181331 75%)}.style-dark{--visual:linear-gradient(145deg,#070710,#4b1d52 48%,#bd426f)}.style-retro{--visual:linear-gradient(135deg,#ef754a,#f5c15e 45%,#513dba)}.style-fantasy{--visual:radial-gradient(circle at 60% 25%,#9ee8ff,#6d5ce7 35%,#10152f 80%)}.ending-grid{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}.ending-grid label{margin:0;flex:1 1 135px}.ending-grid span{display:block;padding:11px;border:1px solid #51486b;border-radius:12px;text-align:center;font-size:13px;color:#c7c5d3}.ending-grid input:checked+span{border-color:var(--violet);color:white;background:rgba(168,117,255,.15)}
 @media(max-width:560px){.style-grid{grid-template-columns:repeat(2,1fr)}.style-card{height:116px}}
+.direction-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0}.direction-tile{background:linear-gradient(145deg,rgba(40,29,68,.9),rgba(15,15,28,.9));border:1px solid rgba(168,117,255,.3);border-radius:16px;padding:14px;min-height:112px}.direction-tile b{display:block;color:var(--cyan);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}.direction-tile strong{font-size:15px;color:#f2eaff}.direction-tile p{font-size:13px;margin:7px 0 0;color:#c7c5d3}.final-preview{background:linear-gradient(135deg,rgba(110,231,255,.09),rgba(168,117,255,.16));border:1px solid rgba(110,231,255,.25);border-radius:18px;padding:18px;margin:14px 0}.final-preview h3{margin:0 0 8px;color:#fff}.review-list{display:grid;gap:8px}.review-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(190,154,255,.14);font-size:14px}.review-row span:first-child{color:#aaa7bb}.review-row span:last-child{text-align:right;color:#f2eaff}.progress-shell{height:10px;background:#29243b;border-radius:99px;overflow:hidden;margin:16px 0}.progress-fill{height:100%;width:8%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:99px;transition:width .5s}.download-button{background:linear-gradient(100deg,#20a967,#48d997)}
+@media(max-width:560px){.direction-grid{grid-template-columns:1fr}.review-row{display:block}.review-row span{display:block}.review-row span:last-child{text-align:left;margin-top:4px}}
 </style>
 </head>
 <body>
@@ -181,24 +183,26 @@ small{color:#aaa}
 </section>
 
 <section id="resumen" class="card hidden">
-<div class="eyebrow">Paso 03 · Dirección</div><h2>Esta es tu dirección creativa.</h2>
+<div class="eyebrow">Paso 03 · Dirección de la IA</div><h2>La IA propone. Vos decidís.</h2>
+<div class="assistant"><b>✦</b><p>Analicé tus decisiones y preparé una dirección creativa inicial. Podés aceptarla, volver atrás o pedir otra versión.</p></div>
 <div id="datos"></div>
-<p>Revisá los datos antes de confirmar. La propuesta de escenas se prepara en el paso siguiente; todavía no se exporta un MP4.</p>
-<button onclick="confirmar();actualizarPaso(4)">CONFIRMAR Y CREAR GUION</button>
+<div id="direccionCreativa" class="direction-grid"></div>
+<p class="reference-note">Esta propuesta es editable. La aprobación del guion ocurre después de revisar cada escena.</p>
+<button onclick="confirmar();actualizarPaso(3)">ACEPTAR DIRECCIÓN Y VER GUION</button>
 <button class="secondary" onclick="mostrar('estilo')">VOLVER A EDITAR</button>
 </section>
 
 <section id="confirmado" class="card hidden">
-<div class="eyebrow">Paso 04 · El guion</div><h2>Tu estudio ya está listo.</h2>
-<div class="success"><strong>El proyecto quedó guardado en este navegador.</strong><br>Ahora podés preparar una primera propuesta de escenas antes de generar el videoclip.</div>
+<div class="eyebrow">Paso 04 · Preparación del guion</div><h2>Tu propuesta está lista para editar.</h2>
+<div class="success"><strong>El proyecto quedó guardado en este navegador.</strong><br>Ahora la IA va a preparar una propuesta de escenas. Después vas a poder editarla antes de aprobarla.</div>
 <div id="confirmacionDatos"></div>
 <div id="estadoGuardado" class="muted-box">Los cambios se guardan automáticamente en este dispositivo.</div>
-<button onclick="generarEscenas();actualizarPaso(4)">VER MI STORYBOARD</button>
+<button onclick="generarEscenas();actualizarPaso(4)">GENERAR MI STORYBOARD</button>
 <button class="secondary" onclick="mostrar('resumen')">VOLVER AL RESUMEN</button>
 </section>
 
 <section id="escenas" class="card hidden">
-<div class="eyebrow">Paso 05 · Storyboard</div><h2>Así podría verse tu videoclip.</h2>
+<div class="eyebrow">Paso 04 · Storyboard y editor</div><h2>Así podría verse tu videoclip.</h2>
 <div class="assistant"><b>✦</b><p>Preparé una primera versión. Tomá las decisiones finales: editá, regenerá o aprobá cada escena.</p></div>
 <p>La IA propone el guion, pero vos tenés la última palabra. Editá, regenerá, agregá o eliminá escenas antes de aprobarlo. Todavía no genera video.</p>
 <div class="scene-tools">
@@ -209,8 +213,18 @@ small{color:#aaa}
 <div id="escenasLista" class="scene-list"></div>
 <div id="estadoGuion" class="muted-box">El guion todavía no está aprobado.</div>
 <div id="estadoGuardadoEscenas" class="muted-box">Las escenas se guardan automáticamente en este dispositivo.</div>
-<button type="button" class="approve" onclick="aprobarGuion()">APROBAR GUIÓN Y CONTINUAR</button>
+<button type="button" class="approve" onclick="aprobarGuion()">APROBAR GUIÓN Y REVISAR VIDEO</button>
 <button onclick="mostrar('confirmado')">VOLVER AL PROYECTO</button>
+</section>
+
+<section id="finalVideo" class="card hidden">
+<div class="eyebrow">Paso 05 · Revisión y generación</div><h2>Todo listo para crear tu videoclip.</h2>
+<div class="assistant"><b>✦</b><p>Revisá el resumen final. Cuando confirmes, comenzará la generación del videoclip.</p></div>
+<div class="final-preview"><h3 id="finalTitulo">Tu videoclip</h3><p id="finalEstado">El proyecto está preparado. Todavía no se inició la generación.</p><div class="progress-shell"><div id="progresoVideo" class="progress-fill"></div></div><div id="mensajeProgreso" class="reference-note">La generación real de imágenes y video se conectará al servidor en la siguiente etapa.</div></div>
+<div id="revisionFinal" class="review-list"></div>
+<button id="botonGenerarFinal" type="button" onclick="iniciarGeneracionFinal()">GENERAR VIDEOCLIP</button>
+<button id="botonDescargarFinal" class="download-button hidden" type="button" onclick="descargarResumen()">DESCARGAR RESUMEN DEL PROYECTO</button>
+<button class="secondary" type="button" onclick="mostrar('escenas');actualizarPaso(3)">VOLVER A EDITAR ESCENAS</button>
 </section>
 </main>
 <nav class="bottom-nav" aria-label="Navegación principal"><button class="active" onclick="mostrar('inicio');actualizarPaso(0)"><span>⌂</span>INICIO</button><button onclick="mostrar('proyecto');actualizarPaso(1)"><span>＋</span>CREAR</button><button onclick="mostrar('proyecto');actualizarPaso(1)"><span>▣</span>PROYECTOS</button><button onclick="alert('La cuenta y el acceso con Gmail se incorporarán con el servidor permanente.')"><span>◉</span>CUENTA</button></nav>
@@ -463,6 +477,7 @@ document.getElementById('datos').innerHTML=
 '<p><b>Videos de referencia:</b> '+identidad.videos.length+'</p>'+
 '<p><b>Se conserva:</b> '+escapar(identidad.preservar.join(', ')||'Sin elementos seleccionados')+'</p>'+
 '<p><b>Entorno:</b> '+escapar(identidad.entorno)+'</p>';
+document.getElementById('direccionCreativa').innerHTML=[['ATMÓSFERA',window.proyectoActual.estilo],['PERSONAJE',identidad.fuente],['ENERGÍA',window.proyectoActual.sincronizacion],['CIERRE',window.proyectoActual.final]].map(f=>'<div class="direction-tile"><b>'+escapar(f[0])+'</b><strong>'+escapar(f[1])+'</strong><p>Propuesta editable para tu videoclip.</p></div>').join('');
 mostrar('resumen');
 }
 function escapar(t){
@@ -516,8 +531,19 @@ window.escenasActuales=resultado.escenas||[];window.escenasTitulo=resultado.titu
 finally{if(boton){boton.disabled=false;boton.textContent='REGENERAR TODAS LAS ESCENAS';}}
 }
 function aprobarGuion(){
-if(!window.escenasActuales||!window.escenasActuales.length){return;}
-window.guionAprobado=true;document.getElementById('estadoGuion').textContent='✓ Guion aprobado. El siguiente paso será generar y aprobar las imágenes de cada escena.';document.getElementById('estadoGuion').className='success';guardarProyecto();
+if(!window.escenasActuales||!window.escenasActuales.length){alert('Primero generá al menos una escena.');return;}
+window.guionAprobado=true;document.getElementById('estadoGuion').textContent='✓ Guion aprobado. Revisá el resumen final antes de generar.';document.getElementById('estadoGuion').className='success';guardarProyecto();renderizarRevisionFinal();mostrar('finalVideo');actualizarPaso(4);
+}
+function renderizarRevisionFinal(){
+let p=window.proyectoActual||{};let escenas=window.escenasActuales||[];
+document.getElementById('finalTitulo').textContent=p.nombre||'Mi videoclip';
+document.getElementById('revisionFinal').innerHTML=[['Canción',p.audio||'Sin canción seleccionada'],['Estilo',p.estilo||'Cinematográfico realista'],['Historia',p.historia||'Historia cinematográfica'],['Final',p.final||'Final emocionante'],['Resolución',p.calidad||'720p'],['Escenas aprobadas',String(escenas.length)]].map(f=>'<div class="review-row"><span>'+escapar(f[0])+'</span><span>'+escapar(f[1])+'</span></div>').join('');
+}
+function iniciarGeneracionFinal(){
+let boton=document.getElementById('botonGenerarFinal');let estado=document.getElementById('finalEstado');let mensaje=document.getElementById('mensajeProgreso');let progreso=document.getElementById('progresoVideo');let descarga=document.getElementById('botonDescargarFinal');
+boton.disabled=true;boton.textContent='PREPARANDO...';let pasos=['Validando identidad y materiales...','Organizando escenas y ritmo...','Preparando generación cinematográfica...','Prototipo listo para conectar al motor de video.'];let i=0;estado.textContent='La propuesta fue aceptada.';let timer=setInterval(()=>{i++;progreso.style.width=Math.min(i*25,100)+'%';mensaje.textContent=pasos[i-1]||pasos[pasos.length-1];if(i>=pasos.length){clearInterval(timer);estado.textContent='✓ Proyecto preparado correctamente.';boton.textContent='GENERACIÓN REAL PENDIENTE';descarga.classList.remove('hidden');}},650);
+}
+function descargarResumen(){let p=window.proyectoActual||{};let texto='VIDEOCLIP IA\n\n'+(p.nombre||'Mi videoclip')+'\nCanción: '+(p.audio||'Sin canción')+'\nEstilo: '+(p.estilo||'')+'\nEscenas: '+((window.escenasActuales||[]).length)+'\n\nEste archivo es un resumen del prototipo. La exportación MP4 se conectará al motor de generación en la siguiente etapa.';let blob=new Blob([texto],{type:'text/plain;charset=utf-8'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(p.nombre||'videoclip-ia')+'-resumen.txt';a.click();URL.revokeObjectURL(a.href);
 }
 function confirmar(){
 if(!window.proyectoActual){mostrarResumen();}
