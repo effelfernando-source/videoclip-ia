@@ -1,25 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#11111d">
+<meta name="theme-color" content="#0b0b14">
 <title>Videoclip IA</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;padding:20px;background:#11111d;color:white;font-family:Arial,sans-serif}
-header{text-align:center;padding:25px 10px}
-.logo{font-size:42px}
-h1{color:#b99aff;margin:10px 0}
-p{color:#c7c5d3;line-height:1.5}
-.card{background:#202033;border:1px solid #393650;border-radius:18px;padding:20px;margin:15px 0}
-button{background:linear-gradient(90deg,#8055e9,#ba69e8);color:white;border:0;border-radius:12px;padding:15px;width:100%;font-size:16px;font-weight:bold;margin-top:12px}
-input,select,textarea{width:100%;padding:13px;margin:8px 0;background:#151522;color:white;border:1px solid #51486b;border-radius:9px}
+:root{--bg:#090910;--panel:rgba(24,23,42,.82);--panel2:#151522;--line:rgba(190,154,255,.22);--violet:#a875ff;--cyan:#6ee7ff;--muted:#a8a6b8}
+body{margin:0;padding:0 0 86px;background:radial-gradient(circle at 15% 0%,#251746 0,#0d0c18 34%,var(--bg) 72%);color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+header{position:relative;text-align:left;padding:28px 22px 20px;max-width:820px;margin:auto}
+.logo{font-size:30px;filter:drop-shadow(0 0 14px rgba(168,117,255,.7))}
+h1{color:#f7f0ff;margin:8px 0;font-size:24px;letter-spacing:.12em;font-weight:800}
+p{color:#c7c5d3;line-height:1.55}
+.card{background:linear-gradient(145deg,rgba(35,31,58,.82),rgba(14,14,25,.88));border:1px solid var(--line);box-shadow:0 20px 70px rgba(0,0,0,.25);border-radius:26px;padding:22px;margin:16px auto;max-width:820px}
+button{background:linear-gradient(100deg,#7952ed,#ce72ef);color:white;border:0;border-radius:15px;padding:15px;width:100%;font-size:15px;font-weight:800;letter-spacing:.02em;margin-top:12px;box-shadow:0 8px 26px rgba(132,82,237,.28);transition:transform .2s,filter .2s}
+button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+input,select,textarea{width:100%;padding:14px;margin:8px 0;background:rgba(9,9,16,.7);color:white;border:1px solid #51486b;border-radius:12px;font:inherit}
 label{display:block;margin:13px 0;color:#eee}
-h2{color:#c7a8ff}
+h2{color:#eadbff;font-size:23px;margin-top:0}
+h3{color:#e7dcff;margin-top:28px}
 small{color:#aaa}
-.hidden{display:none}
+.hidden{display:none!important}
 .audio-panel{background:#151522;border:1px solid #51486b;border-radius:12px;padding:14px;margin:10px 0 16px}
 .audio-status{margin:8px 0;color:#c7c5d3;font-size:14px}
 .audio-error{margin:8px 0;color:#ff9b9b;font-size:14px}
@@ -43,7 +45,19 @@ small{color:#aaa}
 .scene-tools{display:grid;gap:8px;margin:14px 0}
 .scene-tools input{margin:0}
 .scene-tools button{margin:0}
-.muted-box{background:#202033;border:1px solid #51486b;border-radius:12px;padding:12px;color:#c7c5d3}
+.muted-box{background:#202033;border:1px solid #51486b;border-radius:14px;padding:12px;color:#c7c5d3}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--cyan);font-weight:800}
+.hero{min-height:390px;padding:28px 22px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:linear-gradient(180deg,rgba(7,7,15,.08),rgba(7,7,15,.92)),url('https://files.manuscdn.com/user_upload_by_module/session_file/310519664036715552/BtqBQbWVzKyRBMHD.png') center/cover;border:1px solid rgba(196,169,255,.3);box-shadow:0 22px 80px rgba(102,48,208,.28)}
+.hero h2{font-size:38px;line-height:1.02;margin:8px 0;max-width:520px}
+.hero p{max-width:480px;color:#e5e1ef;margin:0}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hero-actions button{flex:1 1 190px;margin:0}
+.hero-actions .secondary{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
+.stepbar{display:flex;gap:6px;margin:8px auto 20px;max-width:820px;padding:0 22px}
+.stepbar span{height:4px;flex:1;border-radius:5px;background:#302b44}.stepbar span.active{background:linear-gradient(90deg,var(--violet),var(--cyan));box-shadow:0 0 12px rgba(168,117,255,.7)}
+.assistant{display:flex;gap:10px;align-items:flex-start;background:rgba(110,231,255,.06);border:1px solid rgba(110,231,255,.18);padding:13px;border-radius:16px;margin-bottom:16px}.assistant b{color:var(--cyan);font-size:18px}.assistant p{margin:0;font-size:14px}
+.bottom-nav{position:fixed;z-index:10;bottom:14px;left:50%;transform:translateX(-50%);width:min(760px,calc(100% - 28px));display:flex;justify-content:space-around;padding:9px 6px;background:rgba(16,15,28,.88);backdrop-filter:blur(18px);border:1px solid rgba(208,182,255,.2);border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.bottom-nav button{background:none;box-shadow:none;margin:0;padding:8px 10px;font-size:11px;color:#aaa7bb;font-weight:700}.bottom-nav button.active{color:#fff}.bottom-nav button span{display:block;font-size:20px;margin-bottom:3px}
 .reference-grid{display:grid;gap:8px;margin:10px 0}
 .reference-choice{background:#151522;border:1px solid #51486b;border-radius:10px;padding:11px;color:#eee}
 .reference-choice input{width:auto;margin:0 8px 0 0}
@@ -54,20 +68,22 @@ small{color:#aaa}
 <body>
 
 <header>
-<div class="logo">🎬</div>
-<h1>VIDEOCLIP IA</h1>
-<p>Convertí tu música en una historia visual.</p>
+<div class="logo">◈ <span style="font-size:13px;letter-spacing:.22em;vertical-align:middle">VIDEOCLIP IA</span></div>
 </header>
 
+<div class="stepbar" id="stepbar" aria-label="Progreso del asistente"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+
 <main>
-<section id="inicio" class="card">
-<h2>Bienvenido</h2>
-<p>Creá tu propio videoclip a partir de una canción y tus imágenes de referencia.</p>
-<button onclick="mostrar('proyecto')">CREAR MI VIDEOCLIP</button>
+<section id="inicio" class="card hero">
+<div class="eyebrow">Estudio creativo · 01</div>
+<h2>Dale una imagen a tu música.</h2>
+<p>Convertí una canción en una historia visual con tu rostro, tu energía y un mundo creado por vos.</p>
+<div class="hero-actions"><button onclick="mostrar('proyecto');actualizarPaso(1)">CREAR MI VIDEOCLIP</button><button class="secondary" onclick="mostrar('proyecto');actualizarPaso(1)">CONTINUAR PROYECTO</button></div>
 </section>
 
 <section id="proyecto" class="card hidden">
-<h2>1. Tu proyecto</h2>
+<div class="eyebrow">Paso 01 · La música</div><h2>Empecemos por tu canción.</h2>
+<div class="assistant"><b>✦</b><p>Subí el MP3. Voy a escuchar su duración, ritmo y energía para ayudarte a construir el videoclip.</p></div>
 <label>Nombre del videoclip</label>
 <input id="nombre" placeholder="Mi primer videoclip">
 <label>Seleccioná tu canción MP3</label>
@@ -119,11 +135,12 @@ small{color:#aaa}
 <textarea id="idea" rows="3" placeholder="Describí tu idea..."></textarea>
 <label>Letra o transcripción de la canción (opcional)</label>
 <textarea id="letra" rows="5" placeholder="Pegá la letra o una transcripción para que la IA pueda sincronizar mejor las escenas..."></textarea>
-<button onclick="mostrar('estilo')">CONTINUAR</button>
+<button onclick="mostrar('estilo');actualizarPaso(2)">CONTINUAR CON EL MUNDO VISUAL</button>
 </section>
 
 <section id="estilo" class="card hidden">
-<h2>2. Elegí tu estilo visual</h2>
+<div class="eyebrow">Paso 02 · El mundo</div><h2>¿En qué mundo sucede?</h2>
+<div class="assistant"><b>✦</b><p>Elegí la atmósfera. Después voy a convertirla en escenas, luces y movimientos de cámara.</p></div>
 <label><input type="radio" name="estilo" value="Cinematográfico realista" checked> 🎥 Película realista</label>
 <label><input type="radio" name="estilo" value="Anime"> 🌸 Anime</label>
 <label><input type="radio" name="estilo" value="Fantasía"> ✨ Fantasía y efectos</label>
@@ -148,28 +165,29 @@ small{color:#aaa}
 <option>720p</option>
 <option>1080p</option>
 </select>
-<button onclick="mostrarResumen()">VER MI PROYECTO</button>
+<button onclick="mostrarResumen();actualizarPaso(3)">CONTINUAR AL GUION</button>
 </section>
 
 <section id="resumen" class="card hidden">
-<h2>3. Revisá tu proyecto</h2>
+<div class="eyebrow">Paso 03 · Dirección</div><h2>Esta es tu dirección creativa.</h2>
 <div id="datos"></div>
 <p>Revisá los datos antes de confirmar. La propuesta de escenas se prepara en el paso siguiente; todavía no se exporta un MP4.</p>
-<button onclick="confirmar()">CONFIRMAR PROYECTO</button>
+<button onclick="confirmar();actualizarPaso(4)">CONFIRMAR Y CREAR GUION</button>
 <button class="secondary" onclick="mostrar('estilo')">VOLVER A EDITAR</button>
 </section>
 
 <section id="confirmado" class="card hidden">
-<h2>4. Proyecto confirmado</h2>
+<div class="eyebrow">Paso 04 · El guion</div><h2>Tu estudio ya está listo.</h2>
 <div class="success"><strong>El proyecto quedó guardado en este navegador.</strong><br>Ahora podés preparar una primera propuesta de escenas antes de generar el videoclip.</div>
 <div id="confirmacionDatos"></div>
 <div id="estadoGuardado" class="muted-box">Los cambios se guardan automáticamente en este dispositivo.</div>
-<button onclick="generarEscenas()">PREPARAR PROPUESTA DE ESCENAS</button>
+<button onclick="generarEscenas();actualizarPaso(4)">VER MI STORYBOARD</button>
 <button class="secondary" onclick="mostrar('resumen')">VOLVER AL RESUMEN</button>
 </section>
 
 <section id="escenas" class="card hidden">
-<h2>5. Propuesta de escenas</h2>
+<div class="eyebrow">Paso 05 · Storyboard</div><h2>Así podría verse tu videoclip.</h2>
+<div class="assistant"><b>✦</b><p>Preparé una primera versión. Tomá las decisiones finales: editá, regenerá o aprobá cada escena.</p></div>
 <p>La IA propone el guion, pero vos tenés la última palabra. Editá, regenerá, agregá o eliminá escenas antes de aprobarlo. Todavía no genera video.</p>
 <div class="scene-tools">
 <input id="indicacionGeneral" placeholder="Indicación para regenerar, por ejemplo: más elegante y con menos personas...">
@@ -183,6 +201,7 @@ small{color:#aaa}
 <button onclick="mostrar('confirmado')">VOLVER AL PROYECTO</button>
 </section>
 </main>
+<nav class="bottom-nav" aria-label="Navegación principal"><button class="active" onclick="mostrar('inicio');actualizarPaso(0)"><span>⌂</span>INICIO</button><button onclick="mostrar('proyecto');actualizarPaso(1)"><span>＋</span>CREAR</button><button onclick="mostrar('proyecto');actualizarPaso(1)"><span>▣</span>PROYECTOS</button><button onclick="alert('La cuenta y el acceso con Gmail se incorporarán con el servidor permanente.')"><span>◉</span>CUENTA</button></nav>
 
 <script>
 let urlAudioActual = null;
@@ -195,6 +214,10 @@ function mostrar(id){
 document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
 document.getElementById(id).classList.remove('hidden');
 window.scrollTo(0,0);
+}
+
+function actualizarPaso(paso){
+let barras=document.querySelectorAll('#stepbar span');barras.forEach((barra,index)=>barra.classList.toggle('active',index<=paso));
 }
 
 function actualizarEstadoGuardado(mensaje){
