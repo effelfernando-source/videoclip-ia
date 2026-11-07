@@ -32,6 +32,17 @@ small{color:#aaa}
 .scene{background:#151522;border:1px solid #51486b;border-radius:12px;padding:14px}
 .scene strong{display:block;color:#d4bcff;margin-bottom:6px}
 .scene small{display:block;color:#aaa;margin-bottom:6px}
+.scene-editor{display:grid;gap:8px;margin-top:12px}
+.scene-editor label{margin:0;color:#aaa;font-size:13px}
+.scene-editor input,.scene-editor textarea{margin:0;background:#202033;border-color:#65588b}
+.scene-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.scene-actions button{width:auto;flex:1 1 140px;margin:0;padding:11px 10px;font-size:13px}
+.scene-actions .danger{background:#5a2940}
+.scene-actions .approve{background:#216343}
+.scene-tools{display:grid;gap:8px;margin:14px 0}
+.scene-tools input{margin:0}
+.scene-tools button{margin:0}
+.muted-box{background:#202033;border:1px solid #51486b;border-radius:12px;padding:12px;color:#c7c5d3}
 </style>
 </head>
 <body>
@@ -123,8 +134,15 @@ small{color:#aaa}
 
 <section id="escenas" class="card hidden">
 <h2>5. Propuesta de escenas</h2>
-<p>La propuesta se genera con inteligencia artificial a partir de los datos del proyecto. Todavía no genera video: primero podés revisar el guion visual.</p>
+<p>La IA propone el guion, pero vos tenés la última palabra. Editá, regenerá, agregá o eliminá escenas antes de aprobarlo. Todavía no genera video.</p>
+<div class="scene-tools">
+<input id="indicacionGeneral" placeholder="Indicación para regenerar, por ejemplo: más elegante y con menos personas...">
+<button type="button" onclick="regenerarTodasLasEscenas()">REGENERAR TODAS LAS ESCENAS</button>
+<button type="button" class="secondary" onclick="crearEscena()">+ AGREGAR ESCENA</button>
+</div>
 <div id="escenasLista" class="scene-list"></div>
+<div id="estadoGuion" class="muted-box">El guion todavía no está aprobado.</div>
+<button type="button" class="approve" onclick="aprobarGuion()">APROBAR GUIÓN Y CONTINUAR</button>
 <button onclick="mostrar('confirmado')">VOLVER AL PROYECTO</button>
 </section>
 </main>
@@ -287,6 +305,57 @@ mostrar('resumen');
 function escapar(t){
 return t.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+function valorSeguro(t){return escapar(String(t==null?'':t));}
+function renderizarEscenas(titulo,concepto){
+let escenas=window.escenasActuales||[];
+document.getElementById('escenasLista').innerHTML=
+'<div class="success"><strong>'+valorSeguro(titulo||'Guion visual')+'</strong><br>'+valorSeguro(concepto||'Revisá y modificá cada escena antes de aprobar.')+'</div>'+escenas.map((escena,index)=>
+'<article class="scene"><strong>ESCENA '+String(index+1).padStart(2,'0')+'</strong><div class="scene-editor">'+
+'<label>Título</label><input value="'+valorSeguro(escena.titulo)+'" oninput="editarEscena('+index+',\'titulo\',this.value)">'+
+'<label>Tiempo</label><input value="'+valorSeguro(escena.tiempo)+'" oninput="editarEscena('+index+',\'tiempo\',this.value)">'+
+'<label>Qué sucede</label><textarea rows="3" oninput="editarEscena('+index+',\'descripcion\',this.value)">'+valorSeguro(escena.descripcion)+'</textarea>'+
+'<label>Propuesta visual</label><textarea rows="5" oninput="editarEscena('+index+',\'visual\',this.value)">'+valorSeguro(escena.visual)+'</textarea>'+
+'<label>Transición</label><input value="'+valorSeguro(escena.transicion)+'" oninput="editarEscena('+index+',\'transicion\',this.value)"></div>'+
+'<div class="scene-actions"><button type="button" onclick="regenerarEscena('+index+')">REGENERAR ESTA</button><button type="button" class="danger" onclick="eliminarEscena('+index+')">ELIMINAR</button></div></article>'
+).join('');
+}
+function editarEscena(index,campo,valor){
+if(window.escenasActuales&&window.escenasActuales[index]){window.escenasActuales[index][campo]=valor;window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Hay cambios sin aprobar.';}
+}
+function crearEscena(){
+if(!window.escenasActuales){window.escenasActuales=[];}
+window.escenasActuales.push({numero:window.escenasActuales.length+1,titulo:'Nueva escena',tiempo:'00:00 — 00:10',descripcion:'Describí qué sucede en esta escena.',visual:'Definí sujeto, acción, cámara, luz, ambiente y ritmo.',transicion:'Corte suave hacia la siguiente escena.'});
+renderizarEscenas(window.escenasTitulo,window.escenasConcepto);
+window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Agregaste una escena. Revisala antes de aprobar.';
+}
+function eliminarEscena(index){
+if(!window.escenasActuales||window.escenasActuales.length<=1){alert('El guion debe conservar al menos una escena.');return;}
+window.escenasActuales.splice(index,1);renderizarEscenas(window.escenasTitulo,window.escenasConcepto);window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Eliminaste una escena. Revisá el orden antes de aprobar.';
+}
+async function regenerarEscena(index){
+let proyecto=window.proyectoActual||{};let indicacion=document.getElementById('indicacionGeneral').value.trim();
+let escena=window.escenasActuales[index];
+document.getElementById('estadoGuion').textContent='Regenerando la escena '+(index+1)+'...';
+try{
+let respuesta=await fetch(escenasApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:proyecto.nombre||'Mi primer videoclip',idea:(proyecto.idea||'')+'\nIndicacion específica para la escena '+(index+1)+': '+(indicacion||escena.visual),letra:proyecto.letra||'',estilo:proyecto.estilo||'Cinematográfico realista',historia:proyecto.historia||'Historia cinematográfica',final:proyecto.final||'Final emocionante',calidad:proyecto.calidad||'720p',duracion:proyecto.duracion||''})});
+let resultado=await respuesta.json();if(!respuesta.ok||!resultado.ok||!resultado.escenas||!resultado.escenas[index])throw new Error('No se pudo regenerar');
+window.escenasActuales[index]=resultado.escenas[index];renderizarEscenas(window.escenasTitulo,window.escenasConcepto);window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Escena regenerada. Revisá los cambios.';
+}catch(error){document.getElementById('estadoGuion').textContent='No se pudo regenerar esta escena. Podés editarla manualmente o reintentar.';}
+}
+async function regenerarTodasLasEscenas(){
+let boton=document.querySelector('#escenas .scene-tools button:not(.secondary)');if(boton){boton.disabled=true;boton.textContent='REGENERANDO...';}
+let proyecto=window.proyectoActual||{};let indicacion=document.getElementById('indicacionGeneral').value.trim();
+try{
+let respuesta=await fetch(escenasApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:proyecto.nombre||'Mi primer videoclip',idea:(proyecto.idea||'')+'\nIndicación general nueva: '+indicacion,letra:proyecto.letra||'',estilo:proyecto.estilo||'Cinematográfico realista',historia:proyecto.historia||'Historia cinematográfica',final:proyecto.final||'Final emocionante',calidad:proyecto.calidad||'720p',duracion:proyecto.duracion||''})});
+let resultado=await respuesta.json();if(!respuesta.ok||!resultado.ok)throw new Error('No se pudo regenerar');
+window.escenasActuales=resultado.escenas||[];window.escenasTitulo=resultado.titulo;window.escenasConcepto=resultado.concepto;renderizarEscenas(resultado.titulo,resultado.concepto);window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Guion regenerado. Revisá y aprobá cuando estés conforme.';
+}catch(error){document.getElementById('estadoGuion').textContent='No se pudo regenerar el guion completo. Intentá nuevamente.';}
+finally{if(boton){boton.disabled=false;boton.textContent='REGENERAR TODAS LAS ESCENAS';}}
+}
+function aprobarGuion(){
+if(!window.escenasActuales||!window.escenasActuales.length){return;}
+window.guionAprobado=true;document.getElementById('estadoGuion').textContent='✓ Guion aprobado. El siguiente paso será generar y aprobar las imágenes de cada escena.';document.getElementById('estadoGuion').className='success';
+}
 function confirmar(){
 if(!window.proyectoActual){mostrarResumen();}
 document.getElementById('confirmacionDatos').innerHTML=
@@ -312,10 +381,7 @@ duracion:proyecto.duracion || ''
 })});
 let resultado=await respuesta.json();
 if(!respuesta.ok || !resultado.ok){throw new Error('No se pudo generar la propuesta.');}
-document.getElementById('escenasLista').innerHTML=
-'<div class="success"><strong>'+escapar(resultado.titulo)+'</strong><br>'+escapar(resultado.concepto)+'</div>'+resultado.escenas.map(escena=>
-'<article class="scene"><strong>'+String(escena.numero).padStart(2,'0')+' · '+escapar(escena.titulo)+'</strong><small>'+escapar(escena.tiempo)+'</small><div><b>Qué sucede:</b> '+escapar(escena.descripcion)+'</div><div><b>Propuesta visual:</b> '+escapar(escena.visual)+'</div><small><b>Transición:</b> '+escapar(escena.transicion)+'</small></article>'
-).join('');
+ window.escenasActuales=resultado.escenas||[];window.escenasTitulo=resultado.titulo;window.escenasConcepto=resultado.concepto;window.guionAprobado=false;document.getElementById('estadoGuion').className='muted-box';document.getElementById('estadoGuion').textContent='El guion todavía no está aprobado.';renderizarEscenas(resultado.titulo,resultado.concepto);
 }catch(error){
 document.getElementById('escenasLista').innerHTML='<div class="audio-error">No se pudo conectar con el servidor seguro de IA. Revisá la conexión e intentá nuevamente.</div><button onclick="generarEscenas()">REINTENTAR</button>';
 }finally{
