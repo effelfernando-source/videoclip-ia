@@ -72,6 +72,7 @@ small{color:#aaa}
 .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.style-grid label{margin:0}.style-grid input,.ending-grid input{display:none}.style-card{height:132px;display:flex;flex-direction:column;justify-content:flex-end;padding:13px;border:1px solid #51486b;border-radius:16px;overflow:hidden;position:relative;background:#211b38;cursor:pointer}.style-card:before{content:"";position:absolute;inset:0;background:var(--visual);opacity:.75;transition:transform .3s,opacity .3s}.style-card>*{position:relative;z-index:1}.style-card strong{font-size:14px;text-shadow:0 2px 8px #000}.style-card small{font-size:11px;color:#eee;margin-top:3px;text-shadow:0 2px 8px #000}.style-grid input:checked+.style-card{border-color:var(--cyan);box-shadow:0 0 24px rgba(110,231,255,.2)}.style-grid input:checked+.style-card:before{transform:scale(1.14);opacity:1}.style-cinema{--visual:radial-gradient(circle at 70% 20%,#f2c37d,#a55f88 25%,#171329 70%)}.style-neon{--visual:linear-gradient(135deg,#051f57,#13d1d1 48%,#d948ef)}.style-dream{--visual:radial-gradient(circle at 30% 15%,#ffd7ec,#9a7ff5 40%,#181331 75%)}.style-dark{--visual:linear-gradient(145deg,#070710,#4b1d52 48%,#bd426f)}.style-retro{--visual:linear-gradient(135deg,#ef754a,#f5c15e 45%,#513dba)}.style-fantasy{--visual:radial-gradient(circle at 60% 25%,#9ee8ff,#6d5ce7 35%,#10152f 80%)}.ending-grid{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}.ending-grid label{margin:0;flex:1 1 135px}.ending-grid span{display:block;padding:11px;border:1px solid #51486b;border-radius:12px;text-align:center;font-size:13px;color:#c7c5d3}.ending-grid input:checked+span{border-color:var(--violet);color:white;background:rgba(168,117,255,.15)}
 @media(max-width:560px){.style-grid{grid-template-columns:repeat(2,1fr)}.style-card{height:116px}}
 .direction-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0}.direction-tile{background:linear-gradient(145deg,rgba(40,29,68,.9),rgba(15,15,28,.9));border:1px solid rgba(168,117,255,.3);border-radius:16px;padding:14px;min-height:112px}.direction-tile b{display:block;color:var(--cyan);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}.direction-tile strong{font-size:15px;color:#f2eaff}.direction-tile p{font-size:13px;margin:7px 0 0;color:#c7c5d3}.final-preview{background:linear-gradient(135deg,rgba(110,231,255,.09),rgba(168,117,255,.16));border:1px solid rgba(110,231,255,.25);border-radius:18px;padding:18px;margin:14px 0}.final-preview h3{margin:0 0 8px;color:#fff}.review-list{display:grid;gap:8px}.review-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(190,154,255,.14);font-size:14px}.review-row span:first-child{color:#aaa7bb}.review-row span:last-child{text-align:right;color:#f2eaff}.progress-shell{height:10px;background:#29243b;border-radius:99px;overflow:hidden;margin:16px 0}.progress-fill{height:100%;width:8%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:99px;transition:width .5s}.download-button{background:linear-gradient(100deg,#20a967,#48d997)}
+.scene-image{margin-top:12px;border-radius:14px;overflow:hidden;border:1px solid rgba(110,231,255,.24);background:#0d0d18;min-height:90px;display:flex;align-items:center;justify-content:center;color:#aaa7bb;font-size:13px;text-align:center}.scene-image img{display:block;width:100%;height:auto;max-height:420px;object-fit:cover}.scene-image.loading{background:linear-gradient(110deg,#161326,#282040,#161326);background-size:200% 100%;animation:shimmer 1.4s linear infinite;color:#e5d9ff}@keyframes shimmer{to{background-position:-200% 0}}
 @media(max-width:560px){.direction-grid{grid-template-columns:1fr}.review-row{display:block}.review-row span{display:block}.review-row span:last-child{text-align:left;margin-top:4px}}
 </style>
 </head>
@@ -232,6 +233,7 @@ small{color:#aaa}
 <script>
 let urlAudioActual = null;
 const escenasApi = 'https://3000-iaydjpvxfcrpl3imybhee-d42ed79e.us5.manus.computer/api/scenes/generate';
+const imagenesApi = 'https://3000-iaydjpvxfcrpl3imybhee-d42ed79e.us5.manus.computer/api/images/generate';
 const proyectoStorageKey = 'videoclip-ia-proyecto-v4';
 const escenasStorageKey = 'videoclip-ia-escenas-v4';
 let guardadoPendiente = null;
@@ -494,7 +496,8 @@ document.getElementById('escenasLista').innerHTML=
 '<label>Qué sucede</label><textarea rows="3" oninput="editarEscena('+index+',\'descripcion\',this.value)">'+valorSeguro(escena.descripcion)+'</textarea>'+
 '<label>Propuesta visual</label><textarea rows="5" oninput="editarEscena('+index+',\'visual\',this.value)">'+valorSeguro(escena.visual)+'</textarea>'+
 '<label>Transición</label><input value="'+valorSeguro(escena.transicion)+'" oninput="editarEscena('+index+',\'transicion\',this.value)"></div>'+
-'<div class="scene-actions"><button type="button" onclick="regenerarEscena('+index+')">REGENERAR ESTA</button><button type="button" class="danger" onclick="eliminarEscena('+index+')">ELIMINAR</button></div></article>'
+'<div id="imagenEscena'+index+'" class="scene-image">'+(escena.imagenUrl?'<img src="'+valorSeguro(escena.imagenUrl)+'" alt="Imagen generada para '+valorSeguro(escena.titulo)+'">':'Todavía no hay imagen para esta escena.')+'</div>'+
+'<div class="scene-actions"><button type="button" onclick="generarImagenEscena('+index+')">'+(escena.imagenUrl?'REGENERAR IMAGEN':'GENERAR IMAGEN')+'</button><button type="button" onclick="regenerarEscena('+index+')">REGENERAR TEXTO</button><button type="button" class="danger" onclick="eliminarEscena('+index+')">ELIMINAR</button></div></article>'
 ).join('');
 }
 function editarEscena(index,campo,valor){
@@ -509,6 +512,15 @@ window.guionAprobado=false;document.getElementById('estadoGuion').textContent='A
 function eliminarEscena(index){
 if(!window.escenasActuales||window.escenasActuales.length<=1){alert('El guion debe conservar al menos una escena.');return;}
 window.escenasActuales.splice(index,1);renderizarEscenas(window.escenasTitulo,window.escenasConcepto);window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Eliminaste una escena. Revisá el orden antes de aprobar.';guardarProyecto();
+}
+async function generarImagenEscena(index){
+let proyecto=window.proyectoActual||{};let escena=window.escenasActuales&&window.escenasActuales[index];let contenedor=document.getElementById('imagenEscena'+index);if(!escena||!contenedor)return;
+contenedor.className='scene-image loading';contenedor.textContent='Generando imagen cinematográfica...';
+try{
+let respuesta=await fetch(imagenesApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:proyecto.nombre||'Mi primer videoclip',estilo:proyecto.estilo||'Cinematográfico realista',escena:{numero:escena.numero||index+1,titulo:escena.titulo,descripcion:escena.descripcion,visual:escena.visual},referencias:[]})});
+let resultado=await respuesta.json();if(!respuesta.ok||!resultado.ok||!resultado.url)throw new Error('No se pudo generar la imagen');
+escena.imagenUrl=resultado.url;window.guionAprobado=false;renderizarEscenas(window.escenasTitulo,window.escenasConcepto);document.getElementById('estadoGuion').textContent='Imagen generada. Revisala y regenerala si querés otra versión.';guardarProyecto();
+}catch(error){contenedor.className='scene-image';contenedor.textContent='No se pudo generar la imagen. Podés reintentar.';}
 }
 async function regenerarEscena(index){
 let proyecto=window.proyectoActual||{};let indicacion=document.getElementById('indicacionGeneral').value.trim();
