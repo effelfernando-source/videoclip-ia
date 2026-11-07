@@ -58,6 +58,12 @@ small{color:#aaa}
 .assistant{display:flex;gap:10px;align-items:flex-start;background:rgba(110,231,255,.06);border:1px solid rgba(110,231,255,.18);padding:13px;border-radius:16px;margin-bottom:16px}.assistant b{color:var(--cyan);font-size:18px}.assistant p{margin:0;font-size:14px}
 .bottom-nav{position:fixed;z-index:10;bottom:14px;left:50%;transform:translateX(-50%);width:min(760px,calc(100% - 28px));display:flex;justify-content:space-around;padding:9px 6px;background:rgba(16,15,28,.88);backdrop-filter:blur(18px);border:1px solid rgba(208,182,255,.2);border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.45)}
 .bottom-nav button{background:none;box-shadow:none;margin:0;padding:8px 10px;font-size:11px;color:#aaa7bb;font-weight:700}.bottom-nav button.active{color:#fff}.bottom-nav button span{display:block;font-size:20px;margin-bottom:3px}
+.upload-card{border:1px dashed rgba(168,117,255,.55);border-radius:18px;padding:18px;background:linear-gradient(135deg,rgba(168,117,255,.12),rgba(110,231,255,.04));text-align:center}
+.upload-card input[type=file]{display:none}.upload-icon{font-size:34px;color:var(--violet);text-shadow:0 0 18px rgba(168,117,255,.7)}.upload-card strong{display:block;font-size:17px;margin:8px 0}.upload-card small{color:var(--muted)}
+.audio-visual{display:flex;align-items:center;gap:3px;height:58px;margin:14px 0 4px;padding:0 8px;border-radius:12px;background:rgba(5,5,12,.65);overflow:hidden}.audio-visual i{display:block;flex:1;min-width:3px;border-radius:5px;background:linear-gradient(180deg,var(--cyan),var(--violet));opacity:.7;height:var(--h);transform-origin:center;animation:pulse 1.1s ease-in-out infinite alternate paused}.audio-visual.playing i{animation-play-state:running}@keyframes pulse{to{transform:scaleY(.45);opacity:1}}
+.sync-options{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.sync-options label{margin:0;flex:1 1 130px}.sync-options input{display:none}.sync-options span{display:block;padding:11px;border:1px solid #51486b;border-radius:12px;text-align:center;color:#c7c5d3;font-size:13px}.sync-options input:checked+span{border-color:var(--cyan);color:white;background:rgba(110,231,255,.1);box-shadow:0 0 15px rgba(110,231,255,.13)}
+.identity-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}.identity-cards label{margin:0}.identity-cards input{display:none}.identity-card{display:block;min-height:118px;padding:13px;border:1px solid #51486b;border-radius:15px;background:linear-gradient(145deg,#211c35,#11111c);cursor:pointer}.identity-card b{display:block;font-size:24px;color:var(--violet);margin-bottom:12px}.identity-card strong{display:block;font-size:13px}.identity-card small{display:block;margin-top:5px;line-height:1.3}.identity-cards input:checked+.identity-card{border-color:var(--cyan);box-shadow:0 0 20px rgba(110,231,255,.15);transform:translateY(-2px)}
+@media(max-width:560px){.identity-cards{grid-template-columns:1fr}.identity-card{min-height:auto;display:grid;grid-template-columns:34px 1fr;column-gap:8px}.identity-card b{grid-row:span 2;margin:0}.identity-card small{margin:2px 0 0}}
 .reference-grid{display:grid;gap:8px;margin:10px 0}
 .reference-choice{background:#151522;border:1px solid #51486b;border-radius:10px;padding:11px;color:#eee}
 .reference-choice input{width:auto;margin:0 8px 0 0}
@@ -86,12 +92,13 @@ small{color:#aaa}
 <div class="assistant"><b>✦</b><p>Subí el MP3. Voy a escuchar su duración, ritmo y energía para ayudarte a construir el videoclip.</p></div>
 <label>Nombre del videoclip</label>
 <input id="nombre" placeholder="Mi primer videoclip">
-<label>Seleccioná tu canción MP3</label>
-<input id="audio" type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/mp4,audio/webm">
+<label>Tu canción</label>
+<div class="upload-card" onclick="document.getElementById('audio').click()"><div class="upload-icon">♫</div><strong id="nombreAudio">Elegí tu MP3</strong><small>MP3, WAV, OGG o M4A · Tocá para buscarlo</small><input id="audio" type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/mp4,audio/webm"></div>
 <div class="audio-panel" aria-live="polite">
 <audio id="reproductorAudio" preload="metadata"></audio>
 <div id="audioEstado" class="audio-status">Todavía no seleccionaste una canción.</div>
 <div id="audioError" class="audio-error" role="alert"></div>
+<div id="ondaAudio" class="audio-visual" aria-label="Visualización de la canción"></div>
 <button type="button" id="botonReproducir" onclick="alternarReproduccion()" disabled>REPRODUCIR</button>
 <div class="audio-buttons">
 <button type="button" onclick="saltarAudio(-10)" disabled>−10 s</button>
@@ -103,9 +110,11 @@ small{color:#aaa}
 <h3>Identidad y materiales de referencia</h3>
 <p class="reference-note">Elegí qué persona debe aparecer y qué elementos querés conservar. La IA modifica el entorno, pero respeta las características que marques.</p>
 <div class="reference-grid">
-<label class="reference-choice"><input type="radio" name="fuenteIdentidad" value="Mi rostro original" checked> Mi rostro original</label>
-<label class="reference-choice"><input type="radio" name="fuenteIdentidad" value="Otra persona autorizada"> Otra persona autorizada</label>
-<label class="reference-choice"><input type="radio" name="fuenteIdentidad" value="Personaje creado por IA"> Personaje creado por IA</label>
+<div class="identity-cards">
+<label><input type="radio" name="fuenteIdentidad" value="Mi rostro original" checked><span class="identity-card"><b>◉</b><strong>Yo aparezco</strong><small>Conservar mi rostro y mi identidad.</small></span></label>
+<label><input type="radio" name="fuenteIdentidad" value="Otra persona autorizada"><span class="identity-card"><b>◎</b><strong>Otra persona</strong><small>Usar una persona autorizada.</small></span></label>
+<label><input type="radio" name="fuenteIdentidad" value="Personaje creado por IA"><span class="identity-card"><b>✦</b><strong>Crear personaje</strong><small>Inventar una identidad visual.</small></span></label>
+</div>
 </div>
 <label>Fotos de rostro, cuerpo o estilo</label>
 <input id="fotosIdentidad" type="file" accept="image/*" multiple onchange="actualizarMateriales()">
@@ -135,6 +144,7 @@ small{color:#aaa}
 <textarea id="idea" rows="3" placeholder="Describí tu idea..."></textarea>
 <label>Letra o transcripción de la canción (opcional)</label>
 <textarea id="letra" rows="5" placeholder="Pegá la letra o una transcripción para que la IA pueda sincronizar mejor las escenas..."></textarea>
+<label>¿Cómo querés que siga la música?</label><div class="sync-options"><label><input type="radio" name="sincronizacion" value="Ritmo" checked><span>◒ Con el ritmo</span></label><label><input type="radio" name="sincronizacion" value="Letra"><span>≋ Con la letra</span></label><label><input type="radio" name="sincronizacion" value="Ritmo y letra"><span>✦ Ritmo + letra</span></label></div>
 <button onclick="mostrar('estilo');actualizarPaso(2)">CONTINUAR CON EL MUNDO VISUAL</button>
 </section>
 
@@ -259,6 +269,7 @@ document.querySelectorAll('input[name="preservar"]').forEach(caja=>caja.checked=
 }
 if(window.proyectoActual.estilo){let radio=document.querySelector('input[name="estilo"][value="'+CSS.escape(window.proyectoActual.estilo)+'"]');if(radio)radio.checked=true;}
 ['historia','final','calidad'].forEach(id=>{if(window.proyectoActual[id])document.getElementById(id).value=window.proyectoActual[id];});
+if(window.proyectoActual.sincronizacion){let sincronizacion=document.querySelector('input[name="sincronizacion"][value="'+CSS.escape(window.proyectoActual.sincronizacion)+'"]');if(sincronizacion)sincronizacion.checked=true;}
 guardadoPendiente='Proyecto recuperado. Volvé a seleccionar el audio si querés reproducirlo o generar una nueva propuesta.';
 }catch(error){console.warn('No se pudo recuperar el proyecto guardado');}
 }
@@ -272,6 +283,11 @@ return String(minutos).padStart(2,'0')+':'+String(segundosRestantes).padStart(2,
 
 function actualizarEstadoAudio(mensaje){
 document.getElementById('audioEstado').textContent=mensaje;
+}
+
+function crearOndaAudio(){
+let onda=document.getElementById('ondaAudio');if(!onda||onda.children.length)return;
+for(let i=0;i<52;i++){let barra=document.createElement('i');barra.style.setProperty('--h',(18+Math.round(Math.random()*70))+'%');barra.style.animationDelay=(i%9)*.07+'s';onda.appendChild(barra);}
 }
 
 function mostrarErrorAudio(mensaje){
@@ -313,6 +329,8 @@ actualizarEstadoAudio('Todavía no seleccionaste una canción.');
 return;
 }
 
+document.getElementById('nombreAudio').textContent=archivo.name;
+
 let extensionValida=/\.(mp3|wav|ogg|oga|m4a|mp4|webm)$/i.test(archivo.name);
 if(!archivo.type.startsWith('audio/') && !extensionValida){
 evento.target.value='';
@@ -348,6 +366,7 @@ let selector=document.getElementById('audio');
 let reproductor=document.getElementById('reproductorAudio');
 let barra=document.getElementById('barraAudio');
 selector.addEventListener('change',cargarAudio);
+crearOndaAudio();
 reproductor.addEventListener('loadedmetadata',function(){
 barra.max=reproductor.duration;
 barra.value=0;
@@ -361,9 +380,11 @@ document.getElementById('tiempoActual').textContent=formatearTiempo(reproductor.
 });
 reproductor.addEventListener('play',function(){
 document.getElementById('botonReproducir').textContent='PAUSAR';
+document.getElementById('ondaAudio').classList.add('playing');
 });
 reproductor.addEventListener('pause',function(){
 document.getElementById('botonReproducir').textContent='REPRODUCIR';
+document.getElementById('ondaAudio').classList.remove('playing');
 });
 reproductor.addEventListener('ended',function(){
 document.getElementById('botonReproducir').textContent='REPRODUCIR';
@@ -421,6 +442,7 @@ estilo:estilo,
 historia:document.getElementById('historia').value,
 final:document.getElementById('final').value,
  calidad:document.getElementById('calidad').value,
+ sincronizacion:document.querySelector('input[name="sincronizacion"]:checked')?.value||'Ritmo y letra',
  identidad:identidad
 };
 guardarProyecto();
