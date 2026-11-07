@@ -69,6 +69,8 @@ small{color:#aaa}
 .reference-choice input{width:auto;margin:0 8px 0 0}
 .reference-note{font-size:13px;color:#aaa;line-height:1.4}
 .file-summary{font-size:13px;color:#bff5d2;margin:7px 0}
+.style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.style-grid label{margin:0}.style-grid input,.ending-grid input{display:none}.style-card{height:132px;display:flex;flex-direction:column;justify-content:flex-end;padding:13px;border:1px solid #51486b;border-radius:16px;overflow:hidden;position:relative;background:#211b38;cursor:pointer}.style-card:before{content:"";position:absolute;inset:0;background:var(--visual);opacity:.75;transition:transform .3s,opacity .3s}.style-card>*{position:relative;z-index:1}.style-card strong{font-size:14px;text-shadow:0 2px 8px #000}.style-card small{font-size:11px;color:#eee;margin-top:3px;text-shadow:0 2px 8px #000}.style-grid input:checked+.style-card{border-color:var(--cyan);box-shadow:0 0 24px rgba(110,231,255,.2)}.style-grid input:checked+.style-card:before{transform:scale(1.14);opacity:1}.style-cinema{--visual:radial-gradient(circle at 70% 20%,#f2c37d,#a55f88 25%,#171329 70%)}.style-neon{--visual:linear-gradient(135deg,#051f57,#13d1d1 48%,#d948ef)}.style-dream{--visual:radial-gradient(circle at 30% 15%,#ffd7ec,#9a7ff5 40%,#181331 75%)}.style-dark{--visual:linear-gradient(145deg,#070710,#4b1d52 48%,#bd426f)}.style-retro{--visual:linear-gradient(135deg,#ef754a,#f5c15e 45%,#513dba)}.style-fantasy{--visual:radial-gradient(circle at 60% 25%,#9ee8ff,#6d5ce7 35%,#10152f 80%)}.ending-grid{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}.ending-grid label{margin:0;flex:1 1 135px}.ending-grid span{display:block;padding:11px;border:1px solid #51486b;border-radius:12px;text-align:center;font-size:13px;color:#c7c5d3}.ending-grid input:checked+span{border-color:var(--violet);color:white;background:rgba(168,117,255,.15)}
+@media(max-width:560px){.style-grid{grid-template-columns:repeat(2,1fr)}.style-card{height:116px}}
 </style>
 </head>
 <body>
@@ -151,9 +153,14 @@ small{color:#aaa}
 <section id="estilo" class="card hidden">
 <div class="eyebrow">Paso 02 · El mundo</div><h2>¿En qué mundo sucede?</h2>
 <div class="assistant"><b>✦</b><p>Elegí la atmósfera. Después voy a convertirla en escenas, luces y movimientos de cámara.</p></div>
-<label><input type="radio" name="estilo" value="Cinematográfico realista" checked> 🎥 Película realista</label>
-<label><input type="radio" name="estilo" value="Anime"> 🌸 Anime</label>
-<label><input type="radio" name="estilo" value="Fantasía"> ✨ Fantasía y efectos</label>
+<div class="style-grid">
+<label><input type="radio" name="estilo" value="Cinematográfico realista" checked><span class="style-card style-cinema"><strong>Cinemático</strong><small>Luz de película y emoción</small></span></label>
+<label><input type="radio" name="estilo" value="Neon futurista"><span class="style-card style-neon"><strong>Neon futurista</strong><small>Ciudad, color y energía</small></span></label>
+<label><input type="radio" name="estilo" value="Onírico"><span class="style-card style-dream"><strong>Onírico</strong><small>Suave, íntimo y soñador</small></span></label>
+<label><input type="radio" name="estilo" value="Oscuro dramático"><span class="style-card style-dark"><strong>Oscuro dramático</strong><small>Tensión y misterio</small></span></label>
+<label><input type="radio" name="estilo" value="Retro pop"><span class="style-card style-retro"><strong>Retro pop</strong><small>Color, textura y actitud</small></span></label>
+<label><input type="radio" name="estilo" value="Fantasía"><span class="style-card style-fantasy"><strong>Fantasía</strong><small>Un mundo imposible</small></span></label>
+</div>
 <label>Tipo de historia</label>
 <select id="historia">
 <option>Historia cinematográfica</option>
@@ -163,12 +170,7 @@ small{color:#aaa}
 <option>Imágenes sincronizadas con la música</option>
 </select>
 <label>¿Cómo querés que termine?</label>
-<select id="final">
-<option>Final emocionante</option>
-<option>Final feliz</option>
-<option>Final dramático</option>
-<option>Final sorpresa</option>
-</select>
+<div class="ending-grid"><label><input type="radio" name="finalVisual" value="Final emocionante" checked onchange="document.getElementById('final').value=this.value"><span>Emocionante</span></label><label><input type="radio" name="finalVisual" value="Final feliz" onchange="document.getElementById('final').value=this.value"><span>Feliz</span></label><label><input type="radio" name="finalVisual" value="Final dramático" onchange="document.getElementById('final').value=this.value"><span>Dramático</span></label><label><input type="radio" name="finalVisual" value="Final sorpresa" onchange="document.getElementById('final').value=this.value"><span>Sorpresa</span></label></div><select id="final" style="display:none"><option>Final emocionante</option><option>Final feliz</option><option>Final dramático</option><option>Final sorpresa</option></select>
 <label>Resolución deseada</label>
 <select id="calidad">
 <option>360p</option>
