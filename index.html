@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -390,4 +391,120 @@ window.proyectoActual={
 nombre:document.getElementById('nombre').value.trim() || 'Mi primer videoclip',
 audio:audio ? audio.name : 'Sin canción seleccionada',
 duracion:document.getElementById('duracionAudio').textContent,
-fotos:docume
+fotos:document.getElementById('fotos').files.length,
+idea:document.getElementById('idea').value.trim() || 'Sin descripción todavía',
+letra:document.getElementById('letra').value.trim(),
+estilo:estilo,
+historia:document.getElementById('historia').value,
+final:document.getElementById('final').value,
+ calidad:document.getElementById('calidad').value,
+ identidad:identidad
+};
+guardarProyecto();
+document.getElementById('datos').innerHTML=
+'<p><b>Nombre:</b> '+escapar(window.proyectoActual.nombre)+'</p>'+
+'<p><b>Canción:</b> '+escapar(window.proyectoActual.audio)+' ('+escapar(window.proyectoActual.duracion)+')</p>'+
+'<p><b>Fotos de referencia:</b> '+window.proyectoActual.fotos+'</p>'+
+'<p><b>Idea:</b> '+escapar(window.proyectoActual.idea)+'</p>'+
+'<p><b>Letra/transcripción:</b> '+(window.proyectoActual.letra ? 'Cargada' : 'No cargada')+'</p>'+
+'<p><b>Estilo:</b> '+escapar(window.proyectoActual.estilo)+'</p>'+
+'<p><b>Historia:</b> '+escapar(window.proyectoActual.historia)+'</p>'+
+'<p><b>Final:</b> '+escapar(window.proyectoActual.final)+'</p>'+
+'<p><b>Resolución:</b> '+escapar(window.proyectoActual.calidad)+'</p>'+
+'<p><b>Identidad:</b> '+escapar(identidad.fuente)+'</p>'+
+'<p><b>Fotos de identidad:</b> '+identidad.fotos.length+'</p>'+
+'<p><b>Videos de referencia:</b> '+identidad.videos.length+'</p>'+
+'<p><b>Se conserva:</b> '+escapar(identidad.preservar.join(', ')||'Sin elementos seleccionados')+'</p>'+
+'<p><b>Entorno:</b> '+escapar(identidad.entorno)+'</p>';
+mostrar('resumen');
+}
+function escapar(t){
+return t.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function valorSeguro(t){return escapar(String(t==null?'':t));}
+function renderizarEscenas(titulo,concepto){
+let escenas=window.escenasActuales||[];
+document.getElementById('escenasLista').innerHTML=
+'<div class="success"><strong>'+valorSeguro(titulo||'Guion visual')+'</strong><br>'+valorSeguro(concepto||'Revisá y modificá cada escena antes de aprobar.')+'</div>'+escenas.map((escena,index)=>
+'<article class="scene"><strong>ESCENA '+String(index+1).padStart(2,'0')+'</strong><div class="scene-editor">'+
+'<label>Título</label><input value="'+valorSeguro(escena.titulo)+'" oninput="editarEscena('+index+',\'titulo\',this.value)">'+
+'<label>Tiempo</label><input value="'+valorSeguro(escena.tiempo)+'" oninput="editarEscena('+index+',\'tiempo\',this.value)">'+
+'<label>Qué sucede</label><textarea rows="3" oninput="editarEscena('+index+',\'descripcion\',this.value)">'+valorSeguro(escena.descripcion)+'</textarea>'+
+'<label>Propuesta visual</label><textarea rows="5" oninput="editarEscena('+index+',\'visual\',this.value)">'+valorSeguro(escena.visual)+'</textarea>'+
+'<label>Transición</label><input value="'+valorSeguro(escena.transicion)+'" oninput="editarEscena('+index+',\'transicion\',this.value)"></div>'+
+'<div class="scene-actions"><button type="button" onclick="regenerarEscena('+index+')">REGENERAR ESTA</button><button type="button" class="danger" onclick="eliminarEscena('+index+')">ELIMINAR</button></div></article>'
+).join('');
+}
+function editarEscena(index,campo,valor){
+if(window.escenasActuales&&window.escenasActuales[index]){window.escenasActuales[index][campo]=valor;window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Hay cambios sin aprobar.';guardarProyecto();}
+}
+function crearEscena(){
+if(!window.escenasActuales){window.escenasActuales=[];}
+window.escenasActuales.push({numero:window.escenasActuales.length+1,titulo:'Nueva escena',tiempo:'00:00 — 00:10',descripcion:'Describí qué sucede en esta escena.',visual:'Definí sujeto, acción, cámara, luz, ambiente y ritmo.',transicion:'Corte suave hacia la siguiente escena.'});
+renderizarEscenas(window.escenasTitulo,window.escenasConcepto);
+window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Agregaste una escena. Revisala antes de aprobar.';guardarProyecto();
+}
+function eliminarEscena(index){
+if(!window.escenasActuales||window.escenasActuales.length<=1){alert('El guion debe conservar al menos una escena.');return;}
+window.escenasActuales.splice(index,1);renderizarEscenas(window.escenasTitulo,window.escenasConcepto);window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Eliminaste una escena. Revisá el orden antes de aprobar.';guardarProyecto();
+}
+async function regenerarEscena(index){
+let proyecto=window.proyectoActual||{};let indicacion=document.getElementById('indicacionGeneral').value.trim();
+let escena=window.escenasActuales[index];
+document.getElementById('estadoGuion').textContent='Regenerando la escena '+(index+1)+'...';
+try{
+let respuesta=await solicitarEscenas({nombre:proyecto.nombre||'Mi primer videoclip',idea:(proyecto.idea||'')+contextoIdentidad(proyecto)+'\nIndicacion específica para la escena '+(index+1)+': '+(indicacion||escena.visual),letra:proyecto.letra||'',estilo:proyecto.estilo||'Cinematográfico realista',historia:proyecto.historia||'Historia cinematográfica',final:proyecto.final||'Final emocionante',calidad:proyecto.calidad||'720p',duracion:proyecto.duracion||''});
+let resultado=await respuesta.json();if(!respuesta.ok||!resultado.ok||!resultado.escenas||!resultado.escenas[index])throw new Error('No se pudo regenerar');
+window.escenasActuales[index]=resultado.escenas[index];renderizarEscenas(window.escenasTitulo,window.escenasConcepto);window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Escena regenerada. Revisá los cambios.';guardarProyecto();
+}catch(error){document.getElementById('estadoGuion').textContent='No se pudo regenerar esta escena. Podés editarla manualmente o reintentar.';}
+}
+async function regenerarTodasLasEscenas(){
+let boton=document.querySelector('#escenas .scene-tools button:not(.secondary)');if(boton){boton.disabled=true;boton.textContent='REGENERANDO...';}
+let proyecto=window.proyectoActual||{};let indicacion=document.getElementById('indicacionGeneral').value.trim();
+try{
+let respuesta=await solicitarEscenas({nombre:proyecto.nombre||'Mi primer videoclip',idea:(proyecto.idea||'')+contextoIdentidad(proyecto)+'\nIndicación general nueva: '+indicacion,letra:proyecto.letra||'',estilo:proyecto.estilo||'Cinematográfico realista',historia:proyecto.historia||'Historia cinematográfica',final:proyecto.final||'Final emocionante',calidad:proyecto.calidad||'720p',duracion:proyecto.duracion||''});
+let resultado=await respuesta.json();if(!respuesta.ok||!resultado.ok)throw new Error('No se pudo regenerar');
+window.escenasActuales=resultado.escenas||[];window.escenasTitulo=resultado.titulo;window.escenasConcepto=resultado.concepto;renderizarEscenas(resultado.titulo,resultado.concepto);window.guionAprobado=false;document.getElementById('estadoGuion').textContent='Guion regenerado. Revisá y aprobá cuando estés conforme.';guardarProyecto();
+}catch(error){document.getElementById('estadoGuion').textContent='No se pudo regenerar el guion completo. Intentá nuevamente.';}
+finally{if(boton){boton.disabled=false;boton.textContent='REGENERAR TODAS LAS ESCENAS';}}
+}
+function aprobarGuion(){
+if(!window.escenasActuales||!window.escenasActuales.length){return;}
+window.guionAprobado=true;document.getElementById('estadoGuion').textContent='✓ Guion aprobado. El siguiente paso será generar y aprobar las imágenes de cada escena.';document.getElementById('estadoGuion').className='success';guardarProyecto();
+}
+function confirmar(){
+if(!window.proyectoActual){mostrarResumen();}
+document.getElementById('confirmacionDatos').innerHTML=
+'<p><b>'+escapar(window.proyectoActual.nombre)+'</b> · '+escapar(window.proyectoActual.audio)+' · '+escapar(window.proyectoActual.calidad)+'</p>';
+mostrar('confirmado');
+if(guardadoPendiente){actualizarEstadoGuardado(guardadoPendiente);guardadoPendiente=null;}
+}
+async function generarEscenas(){
+let proyecto=window.proyectoActual || {};
+let boton=document.querySelector('#confirmado button:not(.secondary)');
+if(boton){boton.disabled=true;boton.textContent='GENERANDO ESCENAS...';}
+document.getElementById('escenasLista').innerHTML='<div class="scene"><strong>La IA está preparando el guion visual...</strong><div>Puede tardar unos segundos.</div></div>';
+mostrar('escenas');
+try{
+let respuesta=await solicitarEscenas({
+nombre:proyecto.nombre || 'Mi primer videoclip',
+ idea:(proyecto.idea || '')+contextoIdentidad(proyecto),
+letra:proyecto.letra || '',
+estilo:proyecto.estilo || 'Cinematográfico realista',
+historia:proyecto.historia || 'Historia cinematográfica',
+final:proyecto.final || 'Final emocionante',
+calidad:proyecto.calidad || '720p',
+duracion:proyecto.duracion || ''
+});
+let resultado=await respuesta.json();
+if(!respuesta.ok || !resultado.ok){throw new Error('No se pudo generar la propuesta.');}
+ window.escenasActuales=resultado.escenas||[];window.escenasTitulo=resultado.titulo;window.escenasConcepto=resultado.concepto;window.guionAprobado=false;document.getElementById('estadoGuion').className='muted-box';document.getElementById('estadoGuion').textContent='El guion todavía no está aprobado.';renderizarEscenas(resultado.titulo,resultado.concepto);guardarProyecto();
+}catch(error){
+document.getElementById('escenasLista').innerHTML='<div class="audio-error">No se pudo conectar con el servidor seguro de IA. Revisá la conexión e intentá nuevamente.</div><button onclick="generarEscenas()">REINTENTAR</button>';
+}finally{
+if(boton){boton.disabled=false;boton.textContent='PREPARAR PROPUESTA DE ESCENAS';}
+}
+}
+</script>
+</body>
+</html>
