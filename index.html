@@ -519,7 +519,7 @@ contenedor.className='scene-image loading';contenedor.textContent='Generando ima
 try{
 let respuesta=await fetch(imagenesApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:proyecto.nombre||'Mi primer videoclip',estilo:proyecto.estilo||'Cinematográfico realista',escena:{numero:escena.numero||index+1,titulo:escena.titulo,descripcion:escena.descripcion,visual:escena.visual},referencias:[]})});
 let resultado=await respuesta.json();if(!respuesta.ok||!resultado.ok||!resultado.url)throw new Error('No se pudo generar la imagen');
-escena.imagenUrl=resultado.url;window.guionAprobado=false;renderizarEscenas(window.escenasTitulo,window.escenasConcepto);document.getElementById('estadoGuion').textContent='Imagen generada. Revisala y regenerala si querés otra versión.';guardarProyecto();
+escena.imagenUrl=resultado.url.startsWith('http')?resultado.url:new URL(resultado.url,imagenesApi).href;window.guionAprobado=false;renderizarEscenas(window.escenasTitulo,window.escenasConcepto);document.getElementById('estadoGuion').textContent='Imagen generada. Revisala y regenerala si querés otra versión.';guardarProyecto();
 }catch(error){contenedor.className='scene-image';contenedor.textContent='No se pudo generar la imagen. Podés reintentar.';}
 }
 async function regenerarEscena(index){
